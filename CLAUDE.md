@@ -9,7 +9,7 @@ You MUST read and follow [docs/DEVELOPER_WORKFLOW.md](./docs/DEVELOPER_WORKFLOW.
 1. **Never commit or push to `main` directly.** Create a feature branch first.
 2. **Branch from latest `main`:** `git checkout main && git pull origin main && git checkout -b <type>/<name>`
 3. **Conventional commits:** `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
-4. **Verify before committing:** `npm run lint && npm run build`
+4. **The pre-commit hook runs lint and build automatically.** If the commit is rejected, fix the issues and try again.
 5. **Push and create a PR:** `git push -u origin <branch> && gh pr create`
 6. **Always return the PR URL** to the user when done.
 

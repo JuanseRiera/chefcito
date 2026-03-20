@@ -14,9 +14,9 @@ gh auth login
 
 ## Golden Rules
 
-1. **Never push directly to `main`.** All changes go through Pull Requests. A `pre-push` git hook enforces this locally.
+1. **Never push directly to `main`.** All changes go through Pull Requests. A `pre-push` hook enforces this locally.
 2. **One feature/fix per branch.** Keep branches focused and short-lived.
-3. **Lint and build are checked automatically** by the `pre-push` hook on every push. Fix failures before pushing.
+3. **Lint and build run automatically on every commit** via a `pre-commit` hook. Failures block the commit until fixed.
 4. **Squash merge** all PRs into `main` for a clean linear history.
 
 ---
@@ -99,7 +99,7 @@ Branch name examples: `feat/recipe-extraction`, `fix/null-servings`, `docs/api-r
 ### 2. Implement
 
 - Write the code and any necessary tests.
-- The `pre-push` hook will automatically run `npm run lint` and `npm run build` when you push. If either fails, the push is rejected until you fix the issues.
+- The `pre-commit` hook automatically runs `npm run lint` and `npm run build` on every commit. If either fails, the commit is rejected until you fix the issues.
 
 ### 3. Commit and push
 
@@ -145,6 +145,6 @@ If you are an AI agent (Claude Code, GitHub Copilot, Cursor, or similar) perform
 2. **Always create a feature branch** from the latest `main` before making changes.
 3. **Always create a PR** using `gh pr create` when your work is complete.
 4. **Always provide the PR URL** to the user when done.
-5. **The pre-push hook runs lint and build automatically.** If the push is rejected, fix the issues and push again.
+5. **The pre-commit hook runs lint and build automatically.** If the commit is rejected, fix the issues and try again.
 6. **Use conventional commit messages** as described above.
 7. **Read the PR template** — your PR body should follow its structure.
