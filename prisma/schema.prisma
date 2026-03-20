@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Recipe {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  originalUrl String?
+  author      String?
+  isFormatted Boolean  @default(false)
+  servings    Int?
+  prepTime    Int? // in minutes
+  cookTime    Int? // in minutes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ingredients      Ingredient[]
+  instructionSteps InstructionStep[]
+}
+
+model Ingredient {
+  id       String  @id @default(cuid())
+  recipeId String
+  quantity Float?
+  unit     String?
+  name     String
+  category String?
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId])
+}
+
+model InstructionStep {
+  id          String @id @default(cuid())
+  recipeId    String
+  stepNumber  Int
+  instruction String
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId])
+}
