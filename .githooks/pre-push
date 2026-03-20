@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+#
+# pre-push hook:
+# 1. Prevents direct pushes to main
+# 2. Runs lint and build checks before any push
+
+protected_branch="main"
+current_branch="$(git symbolic-ref --short HEAD)"
+
+# Block direct pushes to main
+if [ "$current_branch" = "$protected_branch" ]; then
+  echo ""
+  echo "🚫 Direct push to '$protected_branch' is not allowed."
+  echo ""
+  echo "   Create a feature branch and open a Pull Request instead:"
+  echo ""
+  echo "     git checkout -b feat/<your-feature>"
+  echo "     # ... make changes ..."
+  echo "     git push -u origin feat/<your-feature>"
+  echo "     gh pr create"
+  echo ""
+  exit 1
+fi
+
+# Run lint
+echo "Running lint..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "🚫 Lint failed. Fix the errors above before pushing."
+  exit 1
+fi
+
+# Run build
+echo "Running build..."
+npm run build
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "🚫 Build failed. Fix the errors above before pushing."
+  exit 1
+fi
+
+echo "✅ All checks passed."
+exit 0
