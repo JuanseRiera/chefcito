@@ -13,10 +13,13 @@ AI-powered cooking assistant that extracts, formats, and manages recipes using a
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) v22+
+- [GitHub CLI (gh)](https://cli.github.com/)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for PostgreSQL)
 - A [Google Gemini API key](https://aistudio.google.com/apikey)
 
 ## Getting Started
+
+Refer to the [Developer Workflow](./docs/DEVELOPER_WORKFLOW.md) for detailed instructions on the standardized process for this repository, including branch creation, Pull Request guidelines, and other relevant information.
 
 ### 1. Clone and install dependencies
 
@@ -24,7 +27,10 @@ AI-powered cooking assistant that extracts, formats, and manages recipes using a
 git clone <repo-url> chefcito
 cd chefcito
 npm install
+git config core.hooksPath .githooks
 ```
+
+The last command activates the shared git hooks (e.g., prevents direct pushes to `main`).
 
 ### 2. Configure environment variables
 

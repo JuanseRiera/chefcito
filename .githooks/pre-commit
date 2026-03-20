@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# pre-commit hook: runs lint and build checks before every commit.
+
+echo "Running lint..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "🚫 Lint failed. Fix the errors above before committing."
+  exit 1
+fi
+
+echo "Running build..."
+npm run build
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "🚫 Build failed. Fix the errors above before committing."
+  exit 1
+fi
+
+echo "✅ All checks passed."
+exit 0
