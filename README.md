@@ -40,10 +40,10 @@ Copy the example and fill in your values:
 cp .env.example .env
 ```
 
-| Variable | Description | Default |
-|---|---|---|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://postgres:postgres@localhost:5432/chefcito?schema=public` |
-| `GEMINI_API_KEY` | Your Google Gemini API key | — |
+| Variable         | Description                  | Default                                                                |
+| ---------------- | ---------------------------- | ---------------------------------------------------------------------- |
+| `DATABASE_URL`   | PostgreSQL connection string | `postgresql://postgres:postgres@localhost:5432/chefcito?schema=public` |
+| `GEMINI_API_KEY` | Your Google Gemini API key   | —                                                                      |
 
 ### 3. Start the database
 
@@ -115,12 +115,12 @@ chefcito/
 
 ## Scripts
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start dev server with Turbopack |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
+| Command         | Description                     |
+| --------------- | ------------------------------- |
+| `npm run dev`   | Start dev server with Turbopack |
+| `npm run build` | Production build                |
+| `npm run start` | Start production server         |
+| `npm run lint`  | Run ESLint                      |
 
 ## Stopping the database
 

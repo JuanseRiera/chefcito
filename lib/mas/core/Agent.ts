@@ -59,9 +59,7 @@ export abstract class Agent {
     }
   }
 
-  protected abstract executeTask(
-    request: AgentRequest,
-  ): Promise<AgentResponse>;
+  protected abstract executeTask(request: AgentRequest): Promise<AgentResponse>;
 
   protected async sendMessage<T>(
     to: string,

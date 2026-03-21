@@ -116,10 +116,7 @@ export class LLMConnector {
       const message = error.message;
 
       if (status === 429) {
-        return new LLMRateLimitError(
-          `LLM rate limited: ${message}`,
-          error,
-        );
+        return new LLMRateLimitError(`LLM rate limited: ${message}`, error);
       }
       if (status === 403) {
         return new LLMQuotaExceededError(

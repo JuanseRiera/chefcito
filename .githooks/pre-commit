@@ -2,6 +2,14 @@
 #
 # pre-commit hook: runs lint and build checks before every commit.
 
+echo "Running format check..."
+npm run format:check
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "🚫 Formatting check failed. Run 'npm run format' to fix."
+  exit 1
+fi
+
 echo "Running lint..."
 npm run lint
 if [ $? -ne 0 ]; then
