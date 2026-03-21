@@ -59,13 +59,7 @@ export class LLMParsingError extends MASError {
  */
 export class MASInternalError extends MASError {
   constructor(message: string, originalError?: unknown) {
-    super(
-      message,
-      'MAS_INTERNAL_ERROR',
-      undefined,
-      undefined,
-      originalError,
-    );
+    super(message, 'MAS_INTERNAL_ERROR', undefined, undefined, originalError);
   }
 }
 

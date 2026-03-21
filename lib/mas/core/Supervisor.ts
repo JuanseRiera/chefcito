@@ -10,9 +10,7 @@ export abstract class Supervisor {
 
   public registerAgent(agent: Agent): void {
     if (this.agents.has(agent.name)) {
-      throw new Error(
-        `Agent with name "${agent.name}" is already registered.`,
-      );
+      throw new Error(`Agent with name "${agent.name}" is already registered.`);
     }
     this.agents.set(agent.name, agent);
   }
