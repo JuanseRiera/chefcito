@@ -5,7 +5,7 @@ import { ChefcitoError } from '@/lib/types/exceptions';
 import {
   makeExtractedRecipe,
   makeCuratedRecipe,
-} from '../../helpers/factories';
+} from '@/tests/helpers/factories';
 
 // The global prisma singleton in lib/db/prisma.ts uses DATABASE_URL,
 // which is set to chefcito_test by .env.test loaded in tests/setup.ts.

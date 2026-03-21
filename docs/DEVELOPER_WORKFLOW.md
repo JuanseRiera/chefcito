@@ -178,13 +178,34 @@ npm run test:coverage # run with V8 coverage report
 
 `tests/setup.ts` is configured as a Vitest setup file. It calls `dotenv.config({ path: '.env.test', override: true })` **before** any test module is imported. This ensures `DATABASE_URL` is set to the test database before `lib/db/prisma.ts` initializes its singleton `PrismaClient`. The `override: true` flag means `.env.test` values take precedence over any variables already in your shell environment.
 
+### Test file location
+
+Test files live **next to the source files they test**. The file suffix indicates the test layer:
+
+| Suffix                  | Layer       |
+| ----------------------- | ----------- |
+| `*.test.ts`             | Unit        |
+| `*.integration.test.ts` | Integration |
+| `*.e2e.test.ts`         | E2E         |
+
+```
+lib/utils/fetchHtml.ts
+lib/utils/fetchHtml.test.ts                    ← unit
+lib/mas/RecipeSupervisor.ts
+lib/mas/RecipeSupervisor.integration.test.ts   ← integration
+app/api/recipes/extract/route.ts
+app/api/recipes/extract/route.e2e.test.ts      ← e2e
+```
+
+Shared test helpers (factories, SSE parser, DB utilities) remain in `tests/helpers/` and are imported via the `@/tests/helpers/` alias.
+
 ### Test architecture
 
-| Layer           | Directory            | What's mocked                 | What's real           |
-| --------------- | -------------------- | ----------------------------- | --------------------- |
-| **Unit**        | `tests/unit/`        | LLM, fetch, utility functions | The module under test |
-| **Integration** | `tests/integration/` | LLM, agents                   | Supervisor, DB        |
-| **E2E**         | `tests/e2e/`         | RecipeSupervisor              | Route handler, DB     |
+| Layer           | Example file                                   | What's mocked                 | What's real           |
+| --------------- | ---------------------------------------------- | ----------------------------- | --------------------- |
+| **Unit**        | `lib/utils/fetchHtml.test.ts`                  | LLM, fetch, utility functions | The module under test |
+| **Integration** | `lib/mas/RecipeSupervisor.integration.test.ts` | LLM, agents                   | Supervisor, DB        |
+| **E2E**         | `app/api/recipes/extract/route.e2e.test.ts`    | RecipeSupervisor              | Route handler, DB     |
 
 ---
 

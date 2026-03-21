@@ -3,8 +3,11 @@ import { prisma } from '@/lib/db/prisma';
 import {
   makeCuratedRecipe,
   makeExtractedRecipe,
-} from '../../helpers/factories';
-import { consumeSSEStream, type ParsedSSEEvent } from '../../helpers/sseParser';
+} from '@/tests/helpers/factories';
+import {
+  consumeSSEStream,
+  type ParsedSSEEvent,
+} from '@/tests/helpers/sseParser';
 import {
   LLMParsingError,
   LLMRateLimitError,

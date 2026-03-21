@@ -8,7 +8,7 @@ import type {
 import {
   makeExtractedRecipe,
   makeCuratedRecipe,
-} from '../../helpers/factories';
+} from '@/tests/helpers/factories';
 
 // vi.hoisted ensures these are available when vi.mock factories run (hoisted).
 const { mockGetCompletion, mockExtractionProcess, mockCurationProcess } =

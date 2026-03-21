@@ -11,7 +11,13 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       include: ['lib/**/*.ts', 'app/api/**/*.ts'],
-      exclude: ['lib/db/prisma.ts', 'prisma/**', '**/*.d.ts', '**/index.ts'],
+      exclude: [
+        'lib/db/prisma.ts',
+        'prisma/**',
+        '**/*.d.ts',
+        '**/index.ts',
+        '**/*.test.ts',
+      ],
     },
   },
   resolve: {

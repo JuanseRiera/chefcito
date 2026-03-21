@@ -8,7 +8,7 @@ import {
   makeExtractedRecipe,
   makeCurationApprovedJson,
   makeCurationRejectedJson,
-} from '../../helpers/factories';
+} from '@/tests/helpers/factories';
 
 vi.mock('@/lib/mas/prompts/recipeCurator', () => ({
   generateRecipeCurationPrompt: vi

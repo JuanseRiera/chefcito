@@ -6,7 +6,7 @@ import type { LLMConnector } from '@/lib/mas/core/LLMConnector';
 import {
   makeExtractedRecipeJson,
   makeExtractedRecipe,
-} from '../../helpers/factories';
+} from '@/tests/helpers/factories';
 
 vi.mock('@/lib/utils/fetchHtml', () => ({
   fetchHtml: vi.fn(),
