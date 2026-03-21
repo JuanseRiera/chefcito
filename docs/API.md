@@ -130,16 +130,16 @@ curl -N -X POST http://localhost:3000/api/recipes/extract \
 
 ```
 event: progress
-data: {"stage":"fetching","message":"Fetching webpage content..."}
+data: {"stage":"fetching","message":"Loading recipe from URL..."}
 
 event: progress
-data: {"stage":"extracting","message":"Parsing recipe content..."}
+data: {"stage":"extracting","message":"Reading recipe details..."}
 
 event: progress
-data: {"stage":"curating","message":"Reviewing recipe quality..."}
+data: {"stage":"curating","message":"Checking recipe quality..."}
 
 event: progress
-data: {"stage":"persisting","message":"Saving recipe to database..."}
+data: {"stage":"persisting","message":"Saving your recipe..."}
 
 event: result
 data: {"recipe":{"id":"clx123","title":"Pasta Carbonara","description":"A classic Roman pasta dish.","ingredients":[...],"instructionSteps":[...]}}

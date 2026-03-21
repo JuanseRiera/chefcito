@@ -57,15 +57,15 @@ export class RecipeSupervisor extends Supervisor {
           if (attempt > 1) {
             onProgress?.(
               'retrying',
-              `Curator rejected, re-attempting extraction (Attempt ${attempt}/${MAX_CURATION_RETRIES + 1})...`,
+              `Improving recipe, trying again (attempt ${attempt} of ${MAX_CURATION_RETRIES + 1})...`,
               attempt,
             );
           } else {
-            onProgress?.('fetching', 'Fetching webpage content...');
+            onProgress?.('fetching', 'Loading recipe from URL...');
           }
 
           // --- Stage 1: Extraction ---
-          onProgress?.('extracting', 'Parsing recipe content...');
+          onProgress?.('extracting', 'Reading recipe details...');
 
           const extractionPayload: RecipeExtractionPayload = {
             url,
@@ -90,7 +90,7 @@ export class RecipeSupervisor extends Supervisor {
           lastExtractedRecipe = extractedRecipe;
 
           // --- Stage 2: Curation ---
-          onProgress?.('curating', 'Reviewing recipe quality...');
+          onProgress?.('curating', 'Checking recipe quality...');
 
           let curationResult: CurationResult | undefined;
           try {

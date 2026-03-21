@@ -140,7 +140,7 @@ export async function POST(request: Request) {
       );
 
       // 3. Persistence
-      onProgress('persisting', 'Saving recipe to database...');
+      onProgress('persisting', 'Saving your recipe...');
       const persistedRecipe = await recipeService.createRecipe(
         result,
         originalUrl,
