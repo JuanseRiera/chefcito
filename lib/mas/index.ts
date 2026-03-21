@@ -10,6 +10,7 @@ export {
 export { LLMConnector, type ModelConfig } from './core/LLMConnector';
 export { Agent } from './core/Agent';
 export { Supervisor } from './core/Supervisor';
+export { RecipeSupervisor } from './RecipeSupervisor';
 
 // Exception types
 export {
@@ -37,6 +38,7 @@ export type {
   CurationResult,
   CuratedRecipe,
   RecipeCurationPayload,
+  OnProgressCallback,
 } from './types/extraction';
 export {
   extractedRecipeSchema,

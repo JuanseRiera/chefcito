@@ -81,12 +81,27 @@ export interface CuratedRecipe extends ExtractedRecipe {
   summary: string;
 }
 
+// --- Progress callback types ---
+
+import type { PipelineStage } from '../../types/sse';
+
+/**
+ * Progress callback type for the extraction workflow.
+ */
+export type OnProgressCallback = (
+  stage: PipelineStage,
+  message: string,
+  attempt?: number,
+) => void;
+
 // --- Payload types ---
 
 export interface RecipeExtractionPayload {
   url: string;
   /** Optional feedback from a previous curation rejection to guide re-extraction. */
   rejectionFeedback?: string;
+  /** Optional progress callback for SSE streaming. */
+  onProgress?: OnProgressCallback;
 }
 
 export interface RecipeCurationPayload {
