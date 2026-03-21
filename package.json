@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:db:setup": "PGPASSWORD=postgres createdb -h localhost -U postgres chefcito_test && DATABASE_URL=postgresql://postgres:postgres@localhost:5432/chefcito_test npx prisma migrate deploy"
   },
   "dependencies": {
     "@andersmyrmel/vard": "^1.2.0",
@@ -28,6 +32,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.0",
     "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.0",
@@ -36,6 +41,8 @@
     "prettier": "^3.8.1",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^8.0.1",
+    "vitest": "^4.1.0"
   }
 }
