@@ -1,8 +1,20 @@
 export const generateRecipeParsingPrompt = (
   cleanedTextContent: string,
+  rejectionFeedback?: string,
 ): string => {
+  const feedbackBlock = rejectionFeedback
+    ? `
+### Previous Attempt Feedback
+A quality reviewer rejected the previous extraction with this feedback:
+"${rejectionFeedback}"
+Pay special attention to fixing the issues described above in this attempt.
+
+`
+    : '';
+
   return `
 You are an expert chef and data scientist. Your task is to extract all the relevant recipe information from the provided raw text content of a webpage and format it into a rigid JSON structure.
+${feedbackBlock}
 
 ### JSON Schema
 The final output MUST be a valid JSON object matching this TypeScript interface:

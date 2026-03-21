@@ -32,8 +32,11 @@ export class RecipeExtractionAgent extends Agent {
     // Strip sentences that match known prompt injection patterns
     const sanitizedText = sanitizePromptInjection(cleanedText, correlationId);
 
-    // Generate the secure prompt with delimiters
-    const prompt = generateRecipeParsingPrompt(sanitizedText);
+    // Generate the secure prompt with delimiters and optional feedback
+    const prompt = generateRecipeParsingPrompt(
+      sanitizedText,
+      payload.rejectionFeedback,
+    );
 
     // Invoke LLM via the resilient connector
     const llmOutput = await this.llmConnector.getCompletion(

@@ -28,12 +28,19 @@ export { ChefcitoError } from '@/lib/types/exceptions';
 export { Logger, type CorrelationId, type LogEntry } from '@/lib/infra/Logger';
 export { createResiliencePolicy } from '@/lib/infra/resilience';
 
-// Story 1.3: Recipe Extraction Agent
+// Story 1.3: Recipe Extraction & Curation
 export type {
   ExtractedRecipe,
   ExtractedIngredient,
   ExtractedInstructionStep,
   RecipeExtractionPayload,
+  CurationResult,
+  CuratedRecipe,
+  RecipeCurationPayload,
 } from './types/extraction';
-export { extractedRecipeSchema } from './types/extraction';
+export {
+  extractedRecipeSchema,
+  curationResultSchema,
+} from './types/extraction';
 export { RecipeExtractionAgent } from './agents/RecipeExtractionAgent';
+export { RecipeCuratorAgent } from './agents/RecipeCuratorAgent';

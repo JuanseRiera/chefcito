@@ -60,6 +60,35 @@ export type ExtractedInstructionStep = z.infer<
 >;
 export type ExtractedRecipe = z.infer<typeof extractedRecipeSchema>;
 
+// --- Curation types ---
+
+export const curationResultSchema = z.object({
+  approved: z.boolean().describe('Whether the recipe passed quality review'),
+  reason: z
+    .string()
+    .nonempty()
+    .describe('Explanation for approval or rejection'),
+  summary: z
+    .string()
+    .nullable()
+    .describe('2-3 sentence summary of the dish (only when approved)'),
+});
+
+export type CurationResult = z.infer<typeof curationResultSchema>;
+
+/** Recipe enriched with the curator's summary after approval. */
+export interface CuratedRecipe extends ExtractedRecipe {
+  summary: string;
+}
+
+// --- Payload types ---
+
 export interface RecipeExtractionPayload {
   url: string;
+  /** Optional feedback from a previous curation rejection to guide re-extraction. */
+  rejectionFeedback?: string;
+}
+
+export interface RecipeCurationPayload {
+  recipe: ExtractedRecipe;
 }
