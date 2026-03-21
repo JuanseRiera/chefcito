@@ -88,25 +88,51 @@ export abstract class Supervisor {
         const extractedRecipe = extractionResponse.payload
           .data as ExtractedRecipe;
 
-        // Step 2: Curate
-        const curationPayload: RecipeCurationPayload = {
-          recipe: extractedRecipe,
-        };
-        const curationRequest: AgentRequest = {
-          id: crypto.randomUUID(),
-          from: this.name,
-          to: curatorAgent.name,
-          payload: {
-            data: curationPayload,
-            meta: { correlationId },
-          },
-          state: AgentState.IDLE,
-          timestamp: new Date(),
-        };
+        // Step 2: Curate — a curator failure should not discard a valid extraction
+        let curationResult: CurationResult | undefined;
+        try {
+          const curationPayload: RecipeCurationPayload = {
+            recipe: extractedRecipe,
+          };
+          const curationRequest: AgentRequest = {
+            id: crypto.randomUUID(),
+            from: this.name,
+            to: curatorAgent.name,
+            payload: {
+              data: curationPayload,
+              meta: { correlationId },
+            },
+            state: AgentState.IDLE,
+            timestamp: new Date(),
+          };
 
-        const curationResponse: AgentResponse =
-          await curatorAgent.process(curationRequest);
-        const curationResult = curationResponse.payload.data as CurationResult;
+          const curationResponse: AgentResponse =
+            await curatorAgent.process(curationRequest);
+          curationResult = curationResponse.payload.data as CurationResult;
+        } catch (curationError: unknown) {
+          // Curator failed (LLM error, parsing error, etc.) — return the
+          // extraction result without a summary rather than failing entirely
+          logger.log({
+            timestamp: '',
+            level: 'warn',
+            message: `[Supervisor: ${this.name}] Curation failed, returning extraction without summary: ${curationError instanceof Error ? curationError.message : String(curationError)}`,
+            correlationId,
+          });
+
+          return {
+            id: '',
+            title: extractedRecipe.title,
+            description: extractedRecipe.description,
+            originalUrl: url,
+            author: extractedRecipe.author,
+            isFormatted: true,
+            servings: extractedRecipe.servings,
+            prepTime: extractedRecipe.prepTime,
+            cookTime: extractedRecipe.cookTime,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+        }
 
         if (curationResult.approved) {
           const curatedRecipe: CuratedRecipe = {
