@@ -1,85 +1,71 @@
+import vard from '@andersmyrmel/vard';
+import type { Threat } from '@andersmyrmel/vard';
 import { Logger, type CorrelationId } from '@/lib/infra/Logger';
 
 /**
- * Patterns that indicate prompt injection attempts in scraped content.
- * Each regex is tested against individual sentences (case-insensitive).
- */
-const INJECTION_PATTERNS: RegExp[] = [
-  // Direct instruction overrides
-  /ignore\s+(all\s+)?(previous|above|prior|earlier)\s+(instructions?|prompts?|rules?|context)/i,
-  /disregard\s+(all\s+)?(previous|above|prior|earlier)\s+(instructions?|prompts?|rules?|context)/i,
-  /forget\s+(all\s+)?(previous|above|prior|earlier)\s+(instructions?|prompts?|rules?|context)/i,
-  /override\s+(all\s+)?(previous|above|prior|earlier)\s+(instructions?|prompts?|rules?|context)/i,
-
-  // Role hijacking
-  /you\s+are\s+now\s+(a|an|the)\b/i,
-  /act\s+as\s+(a|an|the|if)\b/i,
-  /pretend\s+(you\s+are|to\s+be)\b/i,
-  /switch\s+(to|into)\s+(a|an)?\s*\w+\s*mode/i,
-
-  // System prompt leaking / boundary crossing
-  /system\s*prompt/i,
-  /reveal\s+(your|the)\s+(instructions?|prompt|rules?|system)/i,
-  /what\s+are\s+your\s+(instructions?|rules?|directives?)/i,
-
-  // Output manipulation
-  /output\s+(only|just|exactly)\s*[""'`]/i,
-  /respond\s+with\s+(only|just|exactly)\s*[""'`]/i,
-  /print\s+(only|just|exactly)\s*[""'`]/i,
-  /say\s+(only|just|exactly)\s*[""'`]/i,
-
-  // Delimiter/fence attacks
-  /\[\/?(RECIPE_CONTENT_START|RECIPE_CONTENT_END|SYSTEM|INST|INSTRUCTION)\]/i,
-  /<\/?(system|instruction|prompt|user|assistant)>/i,
-
-  // Code execution attempts
-  /\beval\s*\(/i,
-  /\bexec\s*\(/i,
-  /\bimport\s*\(/i,
-  /require\s*\(\s*['"`]/i,
-];
-
-// Sentence boundary: split on period, exclamation, question mark, or newline
-const SENTENCE_SPLIT = /(?<=[.!?])\s+|\n+/;
-
-/**
- * Removes sentences from scraped text that match known prompt injection
- * patterns. Operates as a defense-in-depth layer before the text is
- * embedded into the LLM prompt.
+ * Removes prompt injection attempts from scraped text using the vard library.
+ * Operates as a defense-in-depth layer before text is embedded into the LLM prompt.
  */
 export function sanitizePromptInjection(
   text: string,
   correlationId?: CorrelationId,
 ): string {
   const logger = Logger.getInstance();
-  const sentences = text.split(SENTENCE_SPLIT);
-  const cleaned: string[] = [];
-  const removed: string[] = [];
+  const detectedThreats: Threat[] = [];
 
-  for (const sentence of sentences) {
-    const trimmed = sentence.trim();
-    if (!trimmed) continue;
+  const guard = vard()
+    .delimiters([
+      'RECIPE_CONTENT_START',
+      'RECIPE_CONTENT_END',
+      'RECIPE_DATA_START',
+      'RECIPE_DATA_END',
+    ])
+    .sanitize('instructionOverride')
+    .sanitize('roleManipulation')
+    .sanitize('delimiterInjection')
+    .sanitize('systemPromptLeak')
+    .sanitize('encoding')
+    .onWarn((threat: Threat) => {
+      detectedThreats.push(threat);
+    });
 
-    const isInjection = INJECTION_PATTERNS.some((pattern) =>
-      pattern.test(trimmed),
-    );
+  const result = guard.safeParse(text);
 
-    if (isInjection) {
-      removed.push(trimmed);
-    } else {
-      cleaned.push(trimmed);
-    }
-  }
-
-  if (removed.length > 0) {
+  if (!result.safe) {
+    // safeParse returns unsafe when threats exceed threshold and action is block.
+    // Since we configured all actions to sanitize, this branch handles edge cases.
     logger.log({
       timestamp: '',
       level: 'warn',
-      message: `Sanitized ${removed.length} suspected prompt injection segment(s) from scraped content.`,
+      message: `Prompt injection detected and blocked: ${result.threats.length} threat(s).`,
       correlationId,
-      data: { removedCount: removed.length, samples: removed.slice(0, 3) },
+      data: {
+        threats: result.threats.map((t) => ({
+          type: t.type,
+          severity: t.severity,
+          match: t.match,
+        })),
+      },
+    });
+    // Return empty string as fallback — the extraction will fail on empty content
+    return '';
+  }
+
+  if (detectedThreats.length > 0) {
+    logger.log({
+      timestamp: '',
+      level: 'warn',
+      message: `Sanitized ${detectedThreats.length} prompt injection threat(s) from scraped content.`,
+      correlationId,
+      data: {
+        threats: detectedThreats.map((t) => ({
+          type: t.type,
+          severity: t.severity,
+          match: t.match,
+        })),
+      },
     });
   }
 
-  return cleaned.join(' ');
+  return result.data;
 }
