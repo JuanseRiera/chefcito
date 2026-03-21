@@ -1,3 +1,5 @@
+import type { CorrelationId } from '@/lib/infra/Logger';
+
 export enum AgentState {
   IDLE = 'IDLE',
   WORKING = 'WORKING',
@@ -5,9 +7,13 @@ export enum AgentState {
   FAILURE = 'FAILURE',
 }
 
+export interface AgentMessageMeta extends Record<string, unknown> {
+  correlationId?: CorrelationId;
+}
+
 export interface AgentMessagePayload<T = unknown> {
   data: T;
-  meta?: Record<string, unknown>;
+  meta?: AgentMessageMeta;
 }
 
 export interface AgentMessage<T = unknown> {
