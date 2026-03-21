@@ -27,3 +27,13 @@ export {
 export { ChefcitoError } from '@/lib/types/exceptions';
 export { Logger, type CorrelationId, type LogEntry } from '@/lib/infra/Logger';
 export { createResiliencePolicy } from '@/lib/infra/resilience';
+
+// Story 1.3: Recipe Extraction Agent
+export type {
+  ExtractedRecipe,
+  ExtractedIngredient,
+  ExtractedInstructionStep,
+  RecipeExtractionPayload,
+} from './types/extraction';
+export { extractedRecipeSchema } from './types/extraction';
+export { RecipeExtractionAgent } from './agents/RecipeExtractionAgent';
