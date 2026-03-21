@@ -6,6 +6,7 @@ import type { RecipeExtractionPayload } from '../types/extraction';
 import { extractedRecipeSchema } from '../types/extraction';
 import { fetchHtml } from '@/lib/utils/fetchHtml';
 import { extractRecipeText } from '@/lib/utils/extractRecipeText';
+import { sanitizePromptInjection } from '@/lib/utils/sanitizePromptInjection';
 import { generateRecipeParsingPrompt } from '../prompts/recipeParser';
 import { Logger } from '@/lib/infra/Logger';
 import { LLMParsingError } from '../types/exceptions';
@@ -28,8 +29,11 @@ export class RecipeExtractionAgent extends Agent {
     // Preprocess HTML into minimized text
     const cleanedText = extractRecipeText(html, correlationId);
 
+    // Strip sentences that match known prompt injection patterns
+    const sanitizedText = sanitizePromptInjection(cleanedText, correlationId);
+
     // Generate the secure prompt with delimiters
-    const prompt = generateRecipeParsingPrompt(cleanedText);
+    const prompt = generateRecipeParsingPrompt(sanitizedText);
 
     // Invoke LLM via the resilient connector
     const llmOutput = await this.llmConnector.getCompletion(
