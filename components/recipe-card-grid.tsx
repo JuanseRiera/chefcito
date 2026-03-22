@@ -1,9 +1,9 @@
 import { RecipeCard } from './recipe-card';
-import type { recipeService } from '@/lib/services/recipeService';
+import type { RecipeService } from '@/lib/services/recipeService';
 
 // Infer the recipe type from the service method return
 type RecipeWithCount = Awaited<
-  ReturnType<typeof recipeService.getAllRecipes>
+  ReturnType<RecipeService['getAllRecipes']>
 >[number];
 
 interface RecipeCardGridProps {

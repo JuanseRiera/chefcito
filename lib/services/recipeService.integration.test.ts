@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, afterAll } from 'vitest';
 import { RecipeService } from '@/lib/services/recipeService';
-import { prisma } from '@/lib/db/prisma';
+import { getPrisma } from '@/lib/db/prisma';
 import { ChefcitoError } from '@/lib/types/exceptions';
 import {
   makeExtractedRecipe,
@@ -11,7 +11,8 @@ import {
 // which is set to chefcito_test by .env.test loaded in tests/setup.ts.
 
 describe('RecipeService (integration)', () => {
-  const service = new RecipeService();
+  const prisma = getPrisma();
+  const service = new RecipeService(prisma);
   const TEST_URL = 'https://example.com/test-recipe';
 
   afterEach(async () => {

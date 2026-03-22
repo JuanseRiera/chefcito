@@ -45,39 +45,31 @@ cp .env.example .env
 | `DATABASE_URL`   | PostgreSQL connection string | `postgresql://postgres:postgres@localhost:5432/chefcito?schema=public` |
 | `GEMINI_API_KEY` | Your Google Gemini API key   | —                                                                      |
 
-### 3. Start the database
+### 3. Run the app
 
-```bash
-docker compose up db -d
-```
+There are two ways to run Chefcito: **Docker (full stack)** for the simplest setup, or **local dev** for faster iteration with HMR.
 
-This starts a PostgreSQL 16 container on port `5432` with a persistent volume.
+#### Option A: Docker (production)
 
-### 4. Run database migrations
-
-```bash
-npx prisma migrate dev
-```
-
-This applies all migrations and generates the Prisma Client.
-
-### 5. Start the dev server
-
-```bash
-npm run dev
-```
-
-The app will be available at [http://localhost:3000](http://localhost:3000).
-
-## Running with Docker (full stack)
-
-To run both the app and database in containers:
+Runs both the app and database in containers. Best for testing the production build.
 
 ```bash
 docker compose up --build
 ```
 
-The app container reads `GEMINI_API_KEY` from your `.env` file. The `DATABASE_URL` is set automatically to point to the `db` service.
+The app will be available at [http://localhost:3000](http://localhost:3000). The `DATABASE_URL` is set automatically to point to the `db` service. `GEMINI_API_KEY` is read from your `.env` file.
+
+#### Option B: Local dev (recommended for development)
+
+Starts only the database in Docker and runs the Next.js dev server locally with Turbopack HMR for instant feedback on code changes.
+
+```bash
+docker compose up db -d
+npx prisma migrate dev
+npm run dev
+```
+
+The app will be available at [http://localhost:3000](http://localhost:3000).
 
 ## Database Schema
 
