@@ -78,6 +78,105 @@ export class RecipeService {
       );
     }
   }
+
+  /**
+   * Retrieves all recipes, ordered by creation date (newest first).
+   * Includes ingredient count for card display on the home page.
+   * Does NOT include full ingredient/instruction relations (use getRecipeById for that).
+   */
+  async getAllRecipes() {
+    logger.log({
+      timestamp: '',
+      level: 'info',
+      message: '[RecipeService] Fetching all recipes',
+    });
+
+    try {
+      const recipes = await prisma.recipe.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          _count: {
+            select: { ingredients: true },
+          },
+        },
+      });
+
+      logger.log({
+        timestamp: '',
+        level: 'info',
+        message: `[RecipeService] Retrieved ${recipes.length} recipes`,
+      });
+
+      return recipes;
+    } catch (error) {
+      logger.log({
+        timestamp: '',
+        level: 'error',
+        message: '[RecipeService] Failed to fetch recipes',
+        data: { error },
+      });
+      throw new ChefcitoError(
+        'Failed to retrieve recipes from database',
+        'QUERY_FAILED',
+      );
+    }
+  }
+
+  /**
+   * Retrieves a single recipe by ID with all relations (ingredients + instruction steps).
+   * Returns null if the recipe does not exist — the caller (Server Component)
+   * is responsible for calling notFound() in that case.
+   */
+  async getRecipeById(id: string) {
+    logger.log({
+      timestamp: '',
+      level: 'info',
+      message: '[RecipeService] Fetching recipe by ID',
+      data: { id },
+    });
+
+    try {
+      const recipe = await prisma.recipe.findUnique({
+        where: { id },
+        include: {
+          ingredients: true,
+          instructionSteps: {
+            orderBy: { stepNumber: 'asc' },
+          },
+        },
+      });
+
+      if (!recipe) {
+        logger.log({
+          timestamp: '',
+          level: 'info',
+          message: '[RecipeService] Recipe not found',
+          data: { id },
+        });
+        return null;
+      }
+
+      logger.log({
+        timestamp: '',
+        level: 'info',
+        message: '[RecipeService] Recipe retrieved successfully',
+        data: { id, title: recipe.title },
+      });
+
+      return recipe;
+    } catch (error) {
+      logger.log({
+        timestamp: '',
+        level: 'error',
+        message: '[RecipeService] Failed to fetch recipe by ID',
+        data: { error, id },
+      });
+      throw new ChefcitoError(
+        'Failed to retrieve recipe from database',
+        'QUERY_FAILED',
+      );
+    }
+  }
 }
 
 // Export a singleton instance
