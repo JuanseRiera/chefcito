@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { recipeService } from '@/lib/services/recipeService';
+import type { RecipeService } from '@/lib/services/recipeService';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { IngredientList } from './ingredient-list';
@@ -7,7 +7,7 @@ import { InstructionSteps } from './instruction-steps';
 
 // Infer type from service method — the non-null variant (we only render when recipe exists)
 type RecipeFull = NonNullable<
-  Awaited<ReturnType<typeof recipeService.getRecipeById>>
+  Awaited<ReturnType<RecipeService['getRecipeById']>>
 >;
 
 interface RecipeDetailProps {

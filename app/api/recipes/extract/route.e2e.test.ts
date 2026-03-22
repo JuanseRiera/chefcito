@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, afterAll } from 'vitest';
-import { prisma } from '@/lib/db/prisma';
+import { getPrisma } from '@/lib/db/prisma';
 import {
   makeCuratedRecipe,
   makeExtractedRecipe,
@@ -46,6 +46,8 @@ function getEvent(
 }
 
 describe('POST /api/recipes/extract (E2E)', () => {
+  const prisma = getPrisma();
+
   afterEach(async () => {
     vi.clearAllMocks();
     // Clean test DB state between tests

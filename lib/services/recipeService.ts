@@ -1,11 +1,14 @@
+import type { PrismaClient } from '@/prisma/generated/client';
 import type { ExtractedRecipe, CuratedRecipe } from '../mas/types/extraction';
-import { prisma } from '../db/prisma';
+import { cache } from 'react';
+import { getPrisma } from '../db/prisma';
 import { Logger } from '../infra/Logger';
 import { ChefcitoError } from '../types/exceptions';
 
 const logger = Logger.getInstance();
 
 export class RecipeService {
+  constructor(private prisma: PrismaClient) {}
   /**
    * Persists an extracted/curated recipe to the database with all relations.
    * Uses an atomic nested create for transactional integrity.
@@ -24,7 +27,7 @@ export class RecipeService {
     try {
       const isCurated = 'summary' in recipeData && recipeData.summary;
 
-      const persistedRecipe = await prisma.recipe.create({
+      const persistedRecipe = await this.prisma.recipe.create({
         data: {
           title: recipeData.title,
           description: isCurated
@@ -92,7 +95,7 @@ export class RecipeService {
     });
 
     try {
-      const recipes = await prisma.recipe.findMany({
+      const recipes = await this.prisma.recipe.findMany({
         orderBy: { createdAt: 'desc' },
         include: {
           _count: {
@@ -136,7 +139,7 @@ export class RecipeService {
     });
 
     try {
-      const recipe = await prisma.recipe.findUnique({
+      const recipe = await this.prisma.recipe.findUnique({
         where: { id },
         include: {
           ingredients: true,
@@ -179,5 +182,4 @@ export class RecipeService {
   }
 }
 
-// Export a singleton instance
-export const recipeService = new RecipeService();
+export const getRecipeService = cache(() => new RecipeService(getPrisma()));

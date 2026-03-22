@@ -1,9 +1,12 @@
+import { connection } from 'next/server';
 import Link from 'next/link';
-import { recipeService } from '@/lib/services/recipeService';
+import { getRecipeService } from '@/lib/services/recipeService';
 import { RecipeCardGrid } from '@/components/recipe-card-grid';
 import { Button } from '@/components/ui/button';
 
 export default async function HomePage() {
+  await connection();
+  const recipeService = getRecipeService();
   const recipes = await recipeService.getAllRecipes();
 
   if (recipes.length === 0) {

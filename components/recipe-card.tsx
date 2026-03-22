@@ -7,10 +7,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { recipeService } from '@/lib/services/recipeService';
+import type { RecipeService } from '@/lib/services/recipeService';
 
 type RecipeWithCount = Awaited<
-  ReturnType<typeof recipeService.getAllRecipes>
+  ReturnType<RecipeService['getAllRecipes']>
 >[number];
 
 interface RecipeCardProps {

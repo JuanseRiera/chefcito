@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createSSEStream } from '@/lib/utils/sseStream';
 import { RecipeSupervisor } from '@/lib/mas/RecipeSupervisor';
-import { recipeService } from '@/lib/services/recipeService';
+import { getRecipeService } from '@/lib/services/recipeService';
 import { Logger } from '@/lib/infra/Logger';
 import type { PipelineStage, SSEErrorCode } from '@/lib/types/sse';
 import {
@@ -141,6 +141,7 @@ export async function POST(request: Request) {
 
       // 3. Persistence
       onProgress('persisting', 'Saving your recipe...');
+      const recipeService = getRecipeService();
       const persistedRecipe = await recipeService.createRecipe(
         result,
         originalUrl,

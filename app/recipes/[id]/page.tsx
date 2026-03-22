@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { recipeService } from '@/lib/services/recipeService';
+import { getRecipeService } from '@/lib/services/recipeService';
 import { RecipeDetail } from '@/components/recipe-detail';
 
 export default async function RecipeDetailPage({
@@ -8,6 +8,7 @@ export default async function RecipeDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const recipeService = getRecipeService();
   const recipe = await recipeService.getRecipeById(id);
 
   if (!recipe) {
