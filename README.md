@@ -96,18 +96,44 @@ npx prisma generate        # Regenerate Prisma Client without migrating
 npx prisma migrate reset   # Drop all data and re-apply all migrations
 ```
 
+## Frontend Pages
+
+Once the dev server is running at [http://localhost:3000](http://localhost:3000), the following pages are available:
+
+| Route | Description |
+| --- | --- |
+| `/` | **Home** — Lists all saved recipes as cards. Shows an empty state with a link to extract your first recipe if none exist. |
+| `/extract` | **Extract a Recipe** — Paste a recipe URL and watch real-time progress as the AI fetches, extracts, and saves the recipe. Uses server-sent events (SSE) to stream pipeline stages. |
+| `/recipes/[id]` | **Recipe Detail** — Full recipe view with ingredients grouped by category, numbered instruction steps, metadata badges, and a link to the original source. |
+
+### Typical workflow
+
+1. Go to `/extract` and paste a URL from a cooking website
+2. Watch the extraction progress (fetching → extracting → reviewing → saving)
+3. When complete, click "View Full Recipe" to see the formatted result
+4. Return to `/` to see the recipe in your collection
+
 ## Project Structure
 
 ```
 chefcito/
-├── app/                    # Next.js App Router (pages, layouts, API routes)
-│   └── generated/prisma/   # Auto-generated Prisma Client (gitignored)
+├── app/                    # Next.js App Router
+│   ├── extract/            # Recipe extraction page (client component, SSE)
+│   ├── recipes/[id]/       # Recipe detail page (server component)
+│   └── api/recipes/        # API routes (extract endpoint)
+├── components/             # Shared React components
+│   └── ui/                 # shadcn/ui primitives (button, card, badge, etc.)
+├── lib/
+│   ├── hooks/              # Custom React hooks (useRecipeExtraction)
+│   ├── services/           # Data access layer (RecipeService)
+│   ├── mas/                # Multi-agent system (Gemini-powered extraction)
+│   ├── db/                 # Prisma client singleton
+│   ├── types/              # Shared TypeScript types (SSE events, exceptions)
+│   └── utils/              # Utility functions
 ├── prisma/
 │   ├── schema.prisma       # Database schema
 │   └── migrations/         # Migration history
-├── public/                 # Static assets
-├── prisma.config.ts        # Prisma configuration
-├── next.config.ts          # Next.js configuration (standalone output)
+├── tests/helpers/          # Shared test utilities
 ├── docker-compose.yml      # PostgreSQL + App services
 ├── Dockerfile              # Multi-stage production build
 └── .env                    # Environment variables (gitignored)
@@ -115,12 +141,17 @@ chefcito/
 
 ## Scripts
 
-| Command         | Description                     |
-| --------------- | ------------------------------- |
-| `npm run dev`   | Start dev server with Turbopack |
-| `npm run build` | Production build                |
-| `npm run start` | Start production server         |
-| `npm run lint`  | Run ESLint                      |
+| Command                | Description                            |
+| ---------------------- | -------------------------------------- |
+| `npm run dev`          | Start dev server with Turbopack        |
+| `npm run build`        | Production build                       |
+| `npm run start`        | Start production server                |
+| `npm run lint`         | Run ESLint                             |
+| `npm run format`       | Format all files with Prettier         |
+| `npm run format:check` | Check formatting without writing       |
+| `npm test`             | Run all tests once                     |
+| `npm run test:watch`   | Re-run tests on file changes           |
+| `npm run test:coverage`| Run tests with V8 coverage report      |
 
 ## Stopping the database
 
