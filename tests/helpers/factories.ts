@@ -7,6 +7,7 @@ export function makeExtractedRecipe(
   overrides: Partial<ExtractedRecipe> = {},
 ): ExtractedRecipe {
   return {
+    language: 'en',
     title: 'Test Chocolate Cake',
     description: 'A delicious test chocolate cake.',
     servings: 8,

@@ -14,6 +14,7 @@ model Recipe {
   id          String   @id @default(cuid())
   title       String
   description String?
+  language    String   @default("en") // ISO 639-1 language code
   originalUrl String?
   author      String?
   isFormatted Boolean  @default(false)

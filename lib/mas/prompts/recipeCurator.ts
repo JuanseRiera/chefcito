@@ -20,6 +20,12 @@ Review the recipe against ALL of the following:
 - **APPROVE** if the recipe is coherent, complete enough to cook from, and internally consistent. Minor imperfections (e.g., a missing prep time, an uncategorized ingredient) are acceptable.
 - **REJECT** if the recipe has fundamental quality issues: garbled/nonsensical content, missing ingredients or instructions, quantities that are clearly wrong, or the title doesn't match the content.
 
+### Language Consistency
+6. **Language**: Check the \`language\` field and verify that ALL generated text fields are in that language. Ingredient categories (e.g., "Pantry", "Dairy"), measurement units (e.g., "cup", "tbsp"), descriptions, and instructions must match the declared language. For example, if \`language\` is \`"es"\`, categories like "Pantry" or "Produce" are wrong — they should be "Despensa" or "Verduras". Units like "cup" should be "taza". Only proper nouns and universally used terms (e.g., brand names, "g", "ml", "kg") are exempt.
+- **REJECT** if you find untranslated English words in categories, units, or descriptions for a non-English recipe. This is an extraction error that must be corrected.
+
+Write the \`reason\` and \`summary\` fields in the same language as the recipe. For example, if the recipe is in Spanish, the summary must be in Spanish.
+
 ### Output Format
 You MUST output ONLY valid JSON matching this structure:
 
@@ -53,12 +59,22 @@ Input recipe title: "Subscribe to our newsletter"
 }
 \`\`\`
 
-#### Example 3 — Rejected
+#### Example 3 — Rejected (quantity error)
 Input recipe title: "Beef Stew"
 \`\`\`json
 {
   "approved": false,
   "reason": "While the title is valid, the recipe lists 500 cups of salt as an ingredient which is clearly an extraction error. The instructions reference 'carrots' and 'potatoes' which are not in the ingredients list, indicating incomplete extraction.",
+  "summary": null
+}
+\`\`\`
+
+#### Example 4 — Rejected (language inconsistency)
+Input recipe language: "es", title: "Arroz con Pollo"
+\`\`\`json
+{
+  "approved": false,
+  "reason": "La receta está en español pero las categorías de ingredientes están en inglés ('Pantry', 'Produce', 'Meat' en vez de 'Despensa', 'Verduras', 'Carnes'). Las unidades también están en inglés ('cup' en vez de 'taza'). Todos los campos de texto deben estar en el idioma declarado.",
   "summary": null
 }
 \`\`\`
