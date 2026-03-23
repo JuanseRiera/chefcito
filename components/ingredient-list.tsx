@@ -8,16 +8,12 @@ interface Ingredient {
 
 interface IngredientListProps {
   ingredients: Ingredient[];
+  otherCategoryLabel: string;
 }
 
-/**
- * Formats a single ingredient as a readable string.
- * Handles null quantity and unit gracefully.
- */
 function formatIngredient(ing: Ingredient): string {
   const parts: string[] = [];
   if (ing.quantity != null) {
-    // Format whole numbers without decimal, fractional with one decimal
     parts.push(
       Number.isInteger(ing.quantity)
         ? ing.quantity.toString()
@@ -31,17 +27,14 @@ function formatIngredient(ing: Ingredient): string {
   return parts.join(' ');
 }
 
-/**
- * Groups ingredients by category.
- * Ingredients with null/empty category go into "Other".
- */
 function groupByCategory(
   ingredients: Ingredient[],
+  otherLabel: string,
 ): Map<string, Ingredient[]> {
   const groups = new Map<string, Ingredient[]>();
 
   for (const ing of ingredients) {
-    const category = ing.category?.trim() || 'Other';
+    const category = ing.category?.trim() || otherLabel;
     const existing = groups.get(category);
     if (existing) {
       existing.push(ing);
@@ -53,8 +46,11 @@ function groupByCategory(
   return groups;
 }
 
-export function IngredientList({ ingredients }: IngredientListProps) {
-  const groups = groupByCategory(ingredients);
+export function IngredientList({
+  ingredients,
+  otherCategoryLabel,
+}: IngredientListProps) {
+  const groups = groupByCategory(ingredients, otherCategoryLabel);
 
   return (
     <div className="space-y-4">

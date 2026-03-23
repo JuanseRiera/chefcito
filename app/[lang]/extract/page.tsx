@@ -10,8 +10,10 @@ import {
   AlertTitle,
 } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { useDictionary } from '@/lib/i18n/dictionary-context';
 
 export default function ExtractPage() {
+  const dict = useDictionary();
   const {
     status,
     completedStages,
@@ -25,24 +27,17 @@ export default function ExtractPage() {
   return (
     <div className="max-w-xl mx-auto">
       <h1 className="font-serif text-3xl text-charcoal mb-2">
-        Extract a Recipe
+        {dict.extract.title}
       </h1>
-      <p className="text-brown-light mb-8">
-        Paste a recipe URL and we&apos;ll format it for you.
-      </p>
+      <p className="text-brown-light mb-8">{dict.extract.subtitle}</p>
 
-      {/* Form — shown in idle, extracting, and error states */}
       {status !== 'success' && (
-        <ExtractForm
-          onSubmit={extract}
-          isLoading={status === 'extracting'}
-        />
+        <ExtractForm onSubmit={extract} isLoading={status === 'extracting'} />
       )}
 
-      {/* Error alert */}
       {status === 'error' && error && (
         <Alert variant="destructive" className="mt-6">
-          <AlertTitle>Extraction Failed</AlertTitle>
+          <AlertTitle>{dict.extract.failed}</AlertTitle>
           <AlertDescription>{error.message}</AlertDescription>
           <Button
             variant="outline"
@@ -50,12 +45,11 @@ export default function ExtractPage() {
             className="mt-3"
             onClick={reset}
           >
-            Try Again
+            {dict.extract.tryAgain}
           </Button>
         </Alert>
       )}
 
-      {/* Live progress */}
       {status === 'extracting' && (
         <ExtractionProgress
           completedStages={completedStages}
@@ -63,7 +57,6 @@ export default function ExtractPage() {
         />
       )}
 
-      {/* Success result */}
       {status === 'success' && result && (
         <ExtractionResult recipe={result} onExtractAnother={reset} />
       )}
