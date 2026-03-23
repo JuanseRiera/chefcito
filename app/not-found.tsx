@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { LinkButton } from '@/components/ui/button';
 
 export default function NotFound() {
   return (
@@ -8,9 +7,9 @@ export default function NotFound() {
       <p className="text-brown-light mb-8 max-w-md">
         The page you&apos;re looking for doesn&apos;t exist.
       </p>
-      <Button render={<Link href="/" />} variant="outline">
+      <LinkButton href="/" variant="outline">
         Back to Home
-      </Button>
+      </LinkButton>
     </div>
   );
 }

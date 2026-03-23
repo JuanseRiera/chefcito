@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { MobileNav } from './mobile-nav';
 
@@ -11,7 +12,8 @@ export function Navbar() {
     <header className="sticky top-0 z-50 bg-parchment border-b border-parchment-dark">
       <nav className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="font-serif text-2xl text-charcoal">
+        <Link href="/" className="flex items-center gap-2 font-serif text-2xl text-charcoal">
+          <Image src="/logo.png" alt="" width={28} height={28} />
           Chefcito
         </Link>
 
