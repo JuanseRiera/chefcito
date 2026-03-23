@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import type { ResultEvent } from '@/lib/types/sse';
 import {
   Card,
@@ -10,7 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button, LinkButton } from '@/components/ui/button';
 
 interface ExtractionResultProps {
   recipe: ResultEvent['data']['recipe'];
@@ -61,9 +60,9 @@ export function ExtractionResult({
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-3 items-stretch sm:flex-row sm:items-center">
-          <Button render={<Link href={`/recipes/${recipe.id}`} />} className="flex-1">
+          <LinkButton href={`/recipes/${recipe.id}`} className="flex-1">
             View Full Recipe
-          </Button>
+          </LinkButton>
           <Button
             variant="ghost"
             onClick={onExtractAnother}

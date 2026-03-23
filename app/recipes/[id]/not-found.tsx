@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { LinkButton } from '@/components/ui/button';
 
 export default function RecipeNotFound() {
   return (
@@ -10,9 +9,9 @@ export default function RecipeNotFound() {
       <p className="text-brown-light mb-8 max-w-md">
         This recipe doesn&apos;t exist or has been removed.
       </p>
-      <Button variant="outline" render={<Link href="/" />}>
+      <LinkButton variant="outline" href="/">
         Back to Recipes
-      </Button>
+      </LinkButton>
     </div>
   );
 }

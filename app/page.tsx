@@ -1,8 +1,7 @@
 import { connection } from 'next/server';
-import Link from 'next/link';
 import { getRecipeService } from '@/lib/services/recipeService';
 import { RecipeCardGrid } from '@/components/recipe-card-grid';
-import { Button } from '@/components/ui/button';
+import { LinkButton } from '@/components/ui/button';
 
 export default async function HomePage() {
   await connection();
@@ -18,7 +17,7 @@ export default async function HomePage() {
         <p className="text-brown-light mb-8 max-w-md">
           No recipes yet. Extract your first recipe to get started!
         </p>
-        <Button render={<Link href="/extract" />}>Extract a Recipe</Button>
+        <LinkButton href="/extract">Extract a Recipe</LinkButton>
       </div>
     );
   }
@@ -27,9 +26,9 @@ export default async function HomePage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-serif text-3xl text-charcoal">Your Recipes</h1>
-        <Button render={<Link href="/extract" />} variant="outline" size="sm">
+        <LinkButton href="/extract" variant="outline" size="sm">
           + Extract Recipe
-        </Button>
+        </LinkButton>
       </div>
       <RecipeCardGrid recipes={recipes} />
     </div>
