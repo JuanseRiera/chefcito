@@ -26,6 +26,10 @@ export const extractedInstructionStepSchema = z.object({
 });
 
 export const extractedRecipeSchema = z.object({
+  language: z
+    .string()
+    .nonempty()
+    .describe('ISO 639-1 language code of the recipe content (e.g., "en", "es", "fr")'),
   title: z.string().nonempty().describe('Recipe title'),
   description: z.string().nullable().describe('Short description or synopsis'),
   servings: z

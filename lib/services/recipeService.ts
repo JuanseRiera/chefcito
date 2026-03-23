@@ -33,6 +33,7 @@ export class RecipeService {
           description: isCurated
             ? (recipeData as CuratedRecipe).summary
             : recipeData.description,
+          language: recipeData.language,
           servings: recipeData.servings,
           prepTime: recipeData.prepTime,
           cookTime: recipeData.cookTime,
