@@ -1,25 +1,31 @@
 import Link from 'next/link';
 import type { RecipeService } from '@/lib/services/recipeService';
+import type { Dictionary } from '@/app/[lang]/dictionaries';
+import type { Locale } from '@/lib/i18n/config';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { IngredientList } from './ingredient-list';
 import { InstructionSteps } from './instruction-steps';
+import { getRecipeLabels } from '@/lib/i18n/recipeLabels';
 
-// Infer type from service method — the non-null variant (we only render when recipe exists)
 type RecipeFull = NonNullable<
   Awaited<ReturnType<RecipeService['getRecipeById']>>
 >;
 
 interface RecipeDetailProps {
   recipe: RecipeFull;
+  dict: Dictionary;
+  lang: Locale;
 }
 
-export function RecipeDetail({ recipe }: RecipeDetailProps) {
+export function RecipeDetail({ recipe, dict, lang }: RecipeDetailProps) {
+  const labels = getRecipeLabels(recipe.language ?? 'en');
+
   return (
     <article>
       {/* Back link */}
       <Link
-        href="/"
+        href={`/${lang}/`}
         className="inline-flex items-center gap-1 text-brown-light hover:text-burgundy transition-colors mb-6"
       >
         <svg
@@ -35,7 +41,7 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
         >
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Back to Recipes
+        {dict.recipeDetail.backToRecipes}
       </Link>
 
       {/* Title */}
@@ -51,20 +57,30 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
       {/* Metadata bar */}
       <div className="flex flex-wrap gap-2 mb-4">
         {recipe.servings != null && (
-          <Badge variant="secondary">{recipe.servings} servings</Badge>
+          <Badge variant="secondary">
+            {recipe.servings} {labels.servings}
+          </Badge>
         )}
         {recipe.prepTime != null && (
-          <Badge variant="secondary">{recipe.prepTime} min prep</Badge>
+          <Badge variant="secondary">
+            {recipe.prepTime} {labels.minPrep}
+          </Badge>
         )}
         {recipe.cookTime != null && (
-          <Badge variant="secondary">{recipe.cookTime} min cook</Badge>
+          <Badge variant="secondary">
+            {recipe.cookTime} {labels.minCook}
+          </Badge>
         )}
       </div>
 
       {/* Attribution */}
       {(recipe.author || recipe.originalUrl) && (
         <div className="text-sm text-brown-light mb-6">
-          {recipe.author && <span>By {recipe.author}</span>}
+          {recipe.author && (
+            <span>
+              {dict.recipeDetail.by} {recipe.author}
+            </span>
+          )}
           {recipe.author && recipe.originalUrl && (
             <span className="mx-2">&middot;</span>
           )}
@@ -75,7 +91,7 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
               rel="noopener noreferrer"
               className="text-burgundy hover:underline"
             >
-              Original source
+              {dict.recipeDetail.originalSource}
             </a>
           )}
         </div>
@@ -88,15 +104,18 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
         {/* Ingredients sidebar */}
         <section>
           <h2 className="font-serif text-xl text-charcoal mb-4">
-            Ingredients
+            {dict.recipeDetail.ingredients}
           </h2>
-          <IngredientList ingredients={recipe.ingredients} />
+          <IngredientList
+            ingredients={recipe.ingredients}
+            otherCategoryLabel={dict.ingredientList.otherCategory}
+          />
         </section>
 
         {/* Instructions main */}
         <section className="mt-8 lg:mt-0">
           <h2 className="font-serif text-xl text-charcoal mb-4">
-            Instructions
+            {dict.recipeDetail.instructions}
           </h2>
           <InstructionSteps steps={recipe.instructionSteps} />
         </section>

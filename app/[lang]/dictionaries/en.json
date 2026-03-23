@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "myRecipes": "My Recipes",
+    "extractRecipe": "Extract Recipe"
+  },
+  "footer": {
+    "tagline": "Your AI-powered cooking companion"
+  },
+  "home": {
+    "title": "Your Recipe Collection",
+    "emptyState": "No recipes yet. Extract your first recipe to get started!",
+    "extractCta": "Extract a Recipe",
+    "yourRecipes": "Your Recipes",
+    "extractButton": "+ Extract Recipe"
+  },
+  "extract": {
+    "title": "Extract a Recipe",
+    "subtitle": "Paste a recipe URL and we'll format it for you.",
+    "failed": "Extraction Failed",
+    "tryAgain": "Try Again"
+  },
+  "extractForm": {
+    "placeholder": "https://example.com/recipe",
+    "ariaLabel": "Recipe URL",
+    "emptyUrl": "Please enter a URL.",
+    "invalidUrl": "Please enter a valid URL (e.g., https://example.com/recipe).",
+    "extracting": "Extracting...",
+    "submit": "Extract Recipe"
+  },
+  "extractionProgress": {
+    "fetching": "Fetching recipe...",
+    "extracting": "Extracting ingredients...",
+    "curating": "Reviewing quality...",
+    "retrying": "Re-extracting...",
+    "persisting": "Saving recipe..."
+  },
+  "extractionResult": {
+    "success": "Recipe extracted successfully!",
+    "viewFullRecipe": "View Full Recipe",
+    "extractAnother": "Extract another"
+  },
+  "recipeDetail": {
+    "backToRecipes": "Back to Recipes",
+    "ingredients": "Ingredients",
+    "instructions": "Instructions",
+    "by": "By",
+    "originalSource": "Original source"
+  },
+  "ingredientList": {
+    "otherCategory": "Other"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "fallback": "An unexpected error occurred.",
+    "tryAgain": "Try Again"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for doesn't exist.",
+    "backHome": "Back to Home"
+  },
+  "recipeNotFound": {
+    "title": "Recipe Not Found",
+    "description": "This recipe doesn't exist or has been removed.",
+    "backToRecipes": "Back to Recipes"
+  },
+  "metadata": {
+    "description": "Your AI-powered cooking companion"
+  },
+  "mobileNav": {
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu"
+  }
+}

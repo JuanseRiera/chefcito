@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useDictionary } from '@/lib/i18n/dictionary-context';
 
 interface MobileNavProps {
   links: { href: string; label: string }[];
@@ -9,6 +10,7 @@ interface MobileNavProps {
 
 export function MobileNav({ links }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const dict = useDictionary();
 
   return (
     <>
@@ -16,7 +18,7 @@ export function MobileNav({ links }: MobileNavProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 text-brown hover:text-burgundy"
-        aria-label={isOpen ? 'Close menu' : 'Open menu'}
+        aria-label={isOpen ? dict.mobileNav.closeMenu : dict.mobileNav.openMenu}
         aria-expanded={isOpen}
       >
         {isOpen ? (

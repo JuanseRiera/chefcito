@@ -10,6 +10,9 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button, LinkButton } from '@/components/ui/button';
+import { useDictionary } from '@/lib/i18n/dictionary-context';
+import { useLocale } from '@/lib/i18n/locale-context';
+import { getRecipeLabels } from '@/lib/i18n/recipeLabels';
 
 interface ExtractionResultProps {
   recipe: ResultEvent['data']['recipe'];
@@ -20,10 +23,14 @@ export function ExtractionResult({
   recipe,
   onExtractAnother,
 }: ExtractionResultProps) {
+  const dict = useDictionary();
+  const lang = useLocale();
+  const labels = getRecipeLabels(recipe.language ?? 'en');
+
   return (
     <div className="mt-8">
       <p className="text-success font-medium mb-4">
-        Recipe extracted successfully!
+        {dict.extractionResult.success}
       </p>
 
       <Card>
@@ -41,34 +48,37 @@ export function ExtractionResult({
           <div className="flex flex-wrap gap-2">
             {recipe.servings != null && (
               <Badge variant="secondary">
-                {recipe.servings} servings
+                {recipe.servings} {labels.servings}
               </Badge>
             )}
             {recipe.prepTime != null && (
               <Badge variant="secondary">
-                {recipe.prepTime} min prep
+                {recipe.prepTime} {labels.minPrep}
               </Badge>
             )}
             {recipe.cookTime != null && (
               <Badge variant="secondary">
-                {recipe.cookTime} min cook
+                {recipe.cookTime} {labels.minCook}
               </Badge>
             )}
             <Badge variant="secondary">
-              {recipe.ingredients.length} ingredients
+              {recipe.ingredients.length} {labels.ingredients}
             </Badge>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-3 items-stretch sm:flex-row sm:items-center">
-          <LinkButton href={`/recipes/${recipe.id}`} className="flex-1">
-            View Full Recipe
+          <LinkButton
+            href={`/${lang}/recipes/${recipe.id}`}
+            className="flex-1"
+          >
+            {dict.extractionResult.viewFullRecipe}
           </LinkButton>
           <Button
             variant="ghost"
             onClick={onExtractAnother}
             className="text-brown-light"
           >
-            Extract another
+            {dict.extractionResult.extractAnother}
           </Button>
         </CardFooter>
       </Card>

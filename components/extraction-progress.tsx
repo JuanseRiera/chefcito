@@ -1,6 +1,7 @@
 'use client';
 
 import type { PipelineStage } from '@/lib/types/sse';
+import { useDictionary } from '@/lib/i18n/dictionary-context';
 
 interface CompletedStage {
   stage: PipelineStage;
@@ -12,21 +13,20 @@ interface ExtractionProgressProps {
   currentStage: { stage: PipelineStage; message: string } | null;
 }
 
-/**
- * Maps pipeline stages to user-friendly display labels.
- */
-const stageLabels: Record<PipelineStage, string> = {
-  fetching: 'Fetching recipe...',
-  extracting: 'Extracting ingredients...',
-  curating: 'Reviewing quality...',
-  retrying: 'Re-extracting...',
-  persisting: 'Saving recipe...',
-};
-
 export function ExtractionProgress({
   completedStages,
   currentStage,
 }: ExtractionProgressProps) {
+  const dict = useDictionary();
+
+  const stageLabels: Record<PipelineStage, string> = {
+    fetching: dict.extractionProgress.fetching,
+    extracting: dict.extractionProgress.extracting,
+    curating: dict.extractionProgress.curating,
+    retrying: dict.extractionProgress.retrying,
+    persisting: dict.extractionProgress.persisting,
+  };
+
   return (
     <div className="mt-8 space-y-3">
       {/* Completed stages */}

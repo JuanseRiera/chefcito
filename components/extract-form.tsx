@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useDictionary } from '@/lib/i18n/dictionary-context';
 
 interface ExtractFormProps {
   onSubmit: (url: string) => void;
@@ -11,9 +12,8 @@ interface ExtractFormProps {
 
 export function ExtractForm({ onSubmit, isLoading }: ExtractFormProps) {
   const [url, setUrl] = useState('');
-  const [validationError, setValidationError] = useState<string | null>(
-    null,
-  );
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const dict = useDictionary();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,14 +21,14 @@ export function ExtractForm({ onSubmit, isLoading }: ExtractFormProps) {
     const trimmed = url.trim();
 
     if (!trimmed) {
-      setValidationError('Please enter a URL.');
+      setValidationError(dict.extractForm.emptyUrl);
       return;
     }
 
     try {
       new URL(trimmed);
     } catch {
-      setValidationError('Please enter a valid URL (e.g., https://example.com/recipe).');
+      setValidationError(dict.extractForm.invalidUrl);
       return;
     }
 
@@ -46,17 +46,17 @@ export function ExtractForm({ onSubmit, isLoading }: ExtractFormProps) {
             setUrl(e.target.value);
             if (validationError) setValidationError(null);
           }}
-          placeholder="https://example.com/recipe"
+          placeholder={dict.extractForm.placeholder}
           disabled={isLoading}
           className="w-full"
-          aria-label="Recipe URL"
+          aria-label={dict.extractForm.ariaLabel}
         />
         {validationError && (
           <p className="text-error text-sm mt-1">{validationError}</p>
         )}
       </div>
       <Button type="submit" disabled={isLoading} className="w-full">
-        {isLoading ? 'Extracting...' : 'Extract Recipe'}
+        {isLoading ? dict.extractForm.extracting : dict.extractForm.submit}
       </Button>
     </form>
   );

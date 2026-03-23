@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import {
   Card,
@@ -7,19 +9,30 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { RecipeService } from '@/lib/services/recipeService';
+import { useLocale } from '@/lib/i18n/locale-context';
+import { getRecipeLabels } from '@/lib/i18n/recipeLabels';
 
-type RecipeWithCount = Awaited<
-  ReturnType<RecipeService['getAllRecipes']>
->[number];
+interface RecipeCardRecipe {
+  id: string;
+  title: string;
+  description: string | null;
+  servings: number | null;
+  prepTime: number | null;
+  cookTime: number | null;
+  language: string | null;
+  _count: { ingredients: number };
+}
 
 interface RecipeCardProps {
-  recipe: RecipeWithCount;
+  recipe: RecipeCardRecipe;
 }
 
 export function RecipeCard({ recipe }: RecipeCardProps) {
+  const lang = useLocale();
+  const labels = getRecipeLabels(recipe.language ?? 'en');
+
   return (
-    <Link href={`/recipes/${recipe.id}`} className="block group">
+    <Link href={`/${lang}/recipes/${recipe.id}`} className="block group">
       <Card className="h-full overflow-hidden transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-lg">
         {/* Image placeholder — for future image support */}
         <div className="h-40 bg-parchment-dark flex items-center justify-center">
@@ -59,21 +72,21 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           <div className="flex flex-wrap gap-2">
             {recipe.servings != null && (
               <Badge variant="secondary" className="text-xs">
-                {recipe.servings} servings
+                {recipe.servings} {labels.servings}
               </Badge>
             )}
             {recipe.prepTime != null && (
               <Badge variant="secondary" className="text-xs">
-                {recipe.prepTime} min prep
+                {recipe.prepTime} {labels.minPrep}
               </Badge>
             )}
             {recipe.cookTime != null && (
               <Badge variant="secondary" className="text-xs">
-                {recipe.cookTime} min cook
+                {recipe.cookTime} {labels.minCook}
               </Badge>
             )}
             <Badge variant="secondary" className="text-xs">
-              {recipe._count.ingredients} ingredients
+              {recipe._count.ingredients} {labels.ingredients}
             </Badge>
           </div>
         </CardFooter>

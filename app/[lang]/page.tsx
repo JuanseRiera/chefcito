@@ -1,9 +1,22 @@
 import { connection } from 'next/server';
+import { notFound } from 'next/navigation';
 import { getRecipeService } from '@/lib/services/recipeService';
 import { RecipeCardGrid } from '@/components/recipe-card-grid';
 import { LinkButton } from '@/components/ui/button';
+import { hasLocale } from '@/lib/i18n/config';
+import type { Locale } from '@/lib/i18n/config';
+import { getDictionary } from './dictionaries';
 
-export default async function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  if (!hasLocale(lang)) notFound();
+
+  const dict = await getDictionary(lang as Locale);
+
   await connection();
   const recipeService = getRecipeService();
   const recipes = await recipeService.getAllRecipes();
@@ -12,12 +25,14 @@ export default async function HomePage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <h1 className="font-serif text-3xl text-charcoal mb-4">
-          Your Recipe Collection
+          {dict.home.title}
         </h1>
         <p className="text-brown-light mb-8 max-w-md">
-          No recipes yet. Extract your first recipe to get started!
+          {dict.home.emptyState}
         </p>
-        <LinkButton href="/extract">Extract a Recipe</LinkButton>
+        <LinkButton href={`/${lang}/extract`}>
+          {dict.home.extractCta}
+        </LinkButton>
       </div>
     );
   }
@@ -25,9 +40,11 @@ export default async function HomePage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="font-serif text-3xl text-charcoal">Your Recipes</h1>
-        <LinkButton href="/extract" variant="outline" size="sm">
-          + Extract Recipe
+        <h1 className="font-serif text-3xl text-charcoal">
+          {dict.home.yourRecipes}
+        </h1>
+        <LinkButton href={`/${lang}/extract`} variant="outline" size="sm">
+          {dict.home.extractButton}
         </LinkButton>
       </div>
       <RecipeCardGrid recipes={recipes} />

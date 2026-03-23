@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "myRecipes": "Mis Recetas",
+    "extractRecipe": "Extraer Receta"
+  },
+  "footer": {
+    "tagline": "Tu asistente de cocina con inteligencia artificial"
+  },
+  "home": {
+    "title": "Tu Colección de Recetas",
+    "emptyState": "Aún no hay recetas. ¡Extrae tu primera receta para comenzar!",
+    "extractCta": "Extraer una Receta",
+    "yourRecipes": "Tus Recetas",
+    "extractButton": "+ Extraer Receta"
+  },
+  "extract": {
+    "title": "Extraer una Receta",
+    "subtitle": "Pega la URL de una receta y la formatearemos por ti.",
+    "failed": "Extracción Fallida",
+    "tryAgain": "Reintentar"
+  },
+  "extractForm": {
+    "placeholder": "https://ejemplo.com/receta",
+    "ariaLabel": "URL de la receta",
+    "emptyUrl": "Por favor ingresa una URL.",
+    "invalidUrl": "Por favor ingresa una URL válida (ej., https://ejemplo.com/receta).",
+    "extracting": "Extrayendo...",
+    "submit": "Extraer Receta"
+  },
+  "extractionProgress": {
+    "fetching": "Obteniendo receta...",
+    "extracting": "Extrayendo ingredientes...",
+    "curating": "Revisando calidad...",
+    "retrying": "Re-extrayendo...",
+    "persisting": "Guardando receta..."
+  },
+  "extractionResult": {
+    "success": "¡Receta extraída exitosamente!",
+    "viewFullRecipe": "Ver Receta Completa",
+    "extractAnother": "Extraer otra"
+  },
+  "recipeDetail": {
+    "backToRecipes": "Volver a Recetas",
+    "ingredients": "Ingredientes",
+    "instructions": "Instrucciones",
+    "by": "Por",
+    "originalSource": "Fuente original"
+  },
+  "ingredientList": {
+    "otherCategory": "Otros"
+  },
+  "error": {
+    "title": "Algo salió mal",
+    "fallback": "Ocurrió un error inesperado.",
+    "tryAgain": "Reintentar"
+  },
+  "notFound": {
+    "title": "Página No Encontrada",
+    "description": "La página que buscas no existe.",
+    "backHome": "Volver al Inicio"
+  },
+  "recipeNotFound": {
+    "title": "Receta No Encontrada",
+    "description": "Esta receta no existe o ha sido eliminada.",
+    "backToRecipes": "Volver a Recetas"
+  },
+  "metadata": {
+    "description": "Tu asistente de cocina con inteligencia artificial"
+  },
+  "mobileNav": {
+    "closeMenu": "Cerrar menú",
+    "openMenu": "Abrir menú"
+  }
+}
