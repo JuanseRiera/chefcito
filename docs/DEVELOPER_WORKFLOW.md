@@ -209,6 +209,41 @@ Shared test helpers (factories, SSE parser, DB utilities) remain in `tests/helpe
 
 ---
 
+## Internationalization (i18n)
+
+The app supports English (`en`) and Spanish (`es`). All user-visible text must be translated — no hardcoded strings in components or pages.
+
+### How it works
+
+- **URL-based locale:** Every route is nested under `/en/` or `/es/`. A proxy (`proxy.ts`) detects the browser's language and redirects unlocalized paths.
+- **Dictionary pattern:** Translations live in `app/[lang]/dictionaries/en.json` and `es.json`. No external i18n libraries are used.
+- **Two-layer approach:**
+  - **App language** (from URL): controls UI chrome — nav, headings, buttons, error pages, form labels.
+  - **Recipe language** (from `recipe.language` DB field): controls recipe metric badges (servings, prep time, cook time, ingredients). A Spanish recipe shows Spanish badges even when the app is in English.
+
+### Adding new text
+
+1. Add the translation key to **both** `en.json` and `es.json`.
+2. In server components, the dictionary is passed as a `dict` prop from the page/layout.
+3. In client components, call `useDictionary()` from `@/lib/i18n/dictionary-context`.
+4. For internal links, always include the locale prefix: `/${lang}/path`. Use the `lang` prop (server) or `useLocale()` (client).
+5. For recipe metric labels, use `getRecipeLabels(recipe.language)` from `lib/i18n/recipeLabels.ts`.
+
+### Key files
+
+| File | Purpose |
+|---|---|
+| `lib/i18n/config.ts` | Locale constants, types, `hasLocale()` |
+| `lib/i18n/dictionary-context.tsx` | `DictionaryProvider` + `useDictionary()` hook (client) |
+| `lib/i18n/locale-context.tsx` | `LocaleProvider` + `useLocale()` hook (client) |
+| `lib/i18n/recipeLabels.ts` | Recipe-language metric labels |
+| `app/[lang]/dictionaries.ts` | `getDictionary()` server function |
+| `app/[lang]/dictionaries/en.json` | English translations |
+| `app/[lang]/dictionaries/es.json` | Spanish translations |
+| `proxy.ts` | Locale detection and redirect |
+
+---
+
 ## For AI Coding Assistants
 
 If you are an AI agent (Claude Code, GitHub Copilot, Cursor, or similar) performing a coding task:
