@@ -55,11 +55,21 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           )}
         </CardContent>
 
-        <CardFooter className="pt-0">
+        <CardFooter>
           <div className="flex flex-wrap gap-2">
+            {recipe.servings != null && (
+              <Badge variant="secondary" className="text-xs">
+                {recipe.servings} servings
+              </Badge>
+            )}
+            {recipe.prepTime != null && (
+              <Badge variant="secondary" className="text-xs">
+                {recipe.prepTime} min prep
+              </Badge>
+            )}
             {recipe.cookTime != null && (
               <Badge variant="secondary" className="text-xs">
-                {recipe.cookTime} min
+                {recipe.cookTime} min cook
               </Badge>
             )}
             <Badge variant="secondary" className="text-xs">
