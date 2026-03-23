@@ -34,7 +34,7 @@ export class LLMConnector {
     }
 
     this.genAI = new GoogleGenAI({ apiKey });
-    this.modelName = 'gemini-pro';
+    this.modelName = 'gemini-2.5-flash';
   }
 
   public static getInstance(): LLMConnector {
