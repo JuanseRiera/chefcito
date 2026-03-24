@@ -84,6 +84,32 @@ export class RecipeService {
   }
 
   /**
+   * Updates the imageUrl of a persisted recipe.
+   * Non-blocking — logs warn on error, never throws.
+   */
+  async updateRecipeImage(id: string, imageUrl: string): Promise<void> {
+    try {
+      await this.prisma.recipe.update({
+        where: { id },
+        data: { imageUrl },
+      });
+      logger.log({
+        timestamp: '',
+        level: 'info',
+        message: `[RecipeService] Recipe image updated`,
+        data: { recipeId: id, imageUrl },
+      });
+    } catch (error) {
+      logger.log({
+        timestamp: '',
+        level: 'warn',
+        message: `[RecipeService] Failed to update recipe image`,
+        data: { error, recipeId: id },
+      });
+    }
+  }
+
+  /**
    * Retrieves all recipes, ordered by creation date (newest first).
    * Includes ingredient count for card display on the home page.
    * Does NOT include full ingredient/instruction relations (use getRecipeById for that).

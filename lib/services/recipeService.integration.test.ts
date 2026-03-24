@@ -110,4 +110,28 @@ describe('RecipeService (integration)', () => {
       service.createRecipe(badRecipe, TEST_URL),
     ).rejects.toBeInstanceOf(ChefcitoError);
   });
+
+  describe('updateRecipeImage', () => {
+    it('updates the imageUrl on an existing recipe', async () => {
+      const persisted = await service.createRecipe(
+        makeExtractedRecipe(),
+        TEST_URL,
+      );
+      const imageUrl =
+        'https://abc.supabase.co/storage/v1/object/public/recipe-images/recipes/test.jpg';
+
+      await service.updateRecipeImage(persisted.id, imageUrl);
+
+      const updated = await prisma.recipe.findUnique({
+        where: { id: persisted.id },
+      });
+      expect(updated?.imageUrl).toBe(imageUrl);
+    });
+
+    it('does not throw when the recipe id does not exist', async () => {
+      await expect(
+        service.updateRecipeImage('non-existent-id', 'https://example.com/x.jpg'),
+      ).resolves.toBeUndefined();
+    });
+  });
 });

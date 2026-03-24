@@ -51,12 +51,15 @@ import { RecipeSupervisor } from '@/lib/mas/RecipeSupervisor';
 
 const TEST_URL = 'https://example.com/chocolate-cake';
 
-function makeExtractionResponse(recipe: ExtractedRecipe): AgentResponse {
+function makeExtractionResponse(
+  recipe: ExtractedRecipe,
+  imageUrl: string | null = null,
+): AgentResponse {
   return {
     id: crypto.randomUUID(),
     from: 'RecipeExtractionAgent',
     to: 'RecipeSupervisor',
-    payload: { data: recipe, meta: {} },
+    payload: { data: recipe, meta: { imageUrl } },
     state: AgentState.SUCCESS,
     timestamp: new Date(),
   };
@@ -96,12 +99,14 @@ describe('RecipeSupervisor', () => {
       }),
     );
 
-    const result = await supervisor.runExtractionWorkflow(TEST_URL);
+    const { recipe, imageUrl } =
+      await supervisor.runExtractionWorkflow(TEST_URL);
 
-    expect(result).toMatchObject({
+    expect(recipe).toMatchObject({
       title: extracted.title,
       summary: 'A delicious chocolate cake.',
     });
+    expect(imageUrl).toBeNull();
   });
 
   it('retries extraction with rejectionFeedback when curator rejects', async () => {
@@ -123,14 +128,14 @@ describe('RecipeSupervisor', () => {
         }),
       );
 
-    const result = await supervisor.runExtractionWorkflow(TEST_URL);
+    const { recipe } = await supervisor.runExtractionWorkflow(TEST_URL);
 
     expect(mockExtractionProcess).toHaveBeenCalledTimes(2);
     // Second extraction call should include the rejection feedback
     const secondCallPayload =
       mockExtractionProcess.mock.calls[1][0].payload.data;
     expect(secondCallPayload.rejectionFeedback).toBe('Missing cook time');
-    expect((result as CuratedRecipe).summary).toBe('Perfect cake.');
+    expect((recipe as CuratedRecipe).summary).toBe('Perfect cake.');
   });
 
   it('returns the raw ExtractedRecipe when curation throws', async () => {
@@ -138,10 +143,10 @@ describe('RecipeSupervisor', () => {
     mockExtractionProcess.mockResolvedValue(makeExtractionResponse(extracted));
     mockCurationProcess.mockRejectedValue(new Error('Curator service down'));
 
-    const result = await supervisor.runExtractionWorkflow(TEST_URL);
+    const { recipe } = await supervisor.runExtractionWorkflow(TEST_URL);
 
-    expect('summary' in result).toBe(false);
-    expect(result.title).toBe(extracted.title);
+    expect('summary' in recipe).toBe(false);
+    expect(recipe.title).toBe(extracted.title);
   });
 
   it('returns last raw ExtractedRecipe after exhausting MAX_CURATION_RETRIES (3 attempts)', async () => {
@@ -155,12 +160,12 @@ describe('RecipeSupervisor', () => {
       }),
     );
 
-    const result = await supervisor.runExtractionWorkflow(TEST_URL);
+    const { recipe } = await supervisor.runExtractionWorkflow(TEST_URL);
 
     // MAX_CURATION_RETRIES = 2, loop runs while attempt <= 2:
     // attempt increments to 1, 2, 3 before exiting. 3 extraction calls.
     expect(mockExtractionProcess).toHaveBeenCalledTimes(3);
-    expect('summary' in result).toBe(false);
+    expect('summary' in recipe).toBe(false);
   });
 
   it('calls onProgress with fetching, extracting, and curating stages on the happy path', async () => {
@@ -218,5 +223,35 @@ describe('RecipeSupervisor', () => {
     await expect(
       supervisor.runExtractionWorkflow(TEST_URL),
     ).rejects.toBeInstanceOf(LLMParsingError);
+  });
+
+  it('threads imageUrl from extraction meta through to the result', async () => {
+    const extracted = makeExtractedRecipe();
+    mockExtractionProcess.mockResolvedValue(
+      makeExtractionResponse(extracted, 'https://example.com/cake.jpg'),
+    );
+    mockCurationProcess.mockResolvedValue(
+      makeCurationResponse({
+        approved: true,
+        reason: 'Good',
+        summary: 'Summary.',
+      }),
+    );
+
+    const { imageUrl } = await supervisor.runExtractionWorkflow(TEST_URL);
+
+    expect(imageUrl).toBe('https://example.com/cake.jpg');
+  });
+
+  it('returns imageUrl from extraction even when curation throws', async () => {
+    const extracted = makeExtractedRecipe();
+    mockExtractionProcess.mockResolvedValue(
+      makeExtractionResponse(extracted, 'https://example.com/cake.jpg'),
+    );
+    mockCurationProcess.mockRejectedValue(new Error('Curator down'));
+
+    const { imageUrl } = await supervisor.runExtractionWorkflow(TEST_URL);
+
+    expect(imageUrl).toBe('https://example.com/cake.jpg');
   });
 });

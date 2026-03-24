@@ -32,7 +32,8 @@
     "extracting": "Extracting ingredients...",
     "curating": "Reviewing quality...",
     "retrying": "Re-extracting...",
-    "persisting": "Saving recipe..."
+    "persisting": "Saving recipe...",
+    "uploading_image": "Uploading recipe image..."
   },
   "extractionResult": {
     "success": "Recipe extracted successfully!",

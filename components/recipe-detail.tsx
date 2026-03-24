@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { RecipeService } from '@/lib/services/recipeService';
 import type { Dictionary } from '@/app/[lang]/dictionaries';
 import type { Locale } from '@/lib/i18n/config';
@@ -43,6 +44,19 @@ export function RecipeDetail({ recipe, dict, lang }: RecipeDetailProps) {
         </svg>
         {dict.recipeDetail.backToRecipes}
       </Link>
+
+      {/* Hero image */}
+      {recipe.imageUrl && (
+        <div className="relative w-full h-64 rounded-lg overflow-hidden mb-6">
+          <Image
+            src={recipe.imageUrl}
+            alt={recipe.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
 
       {/* Title */}
       <h1 className="font-serif text-3xl md:text-4xl text-charcoal mb-3">

@@ -12,7 +12,8 @@ export type PipelineStage =
   | 'extracting' // LLM parsing the recipe
   | 'curating' // LLM reviewing quality
   | 'retrying' // Curation rejected, re-extracting
-  | 'persisting'; // Saving to database
+  | 'persisting' // Saving to database
+  | 'uploading_image'; // Uploading recipe image to storage
 
 /**
  * Base structure for all SSE events.
