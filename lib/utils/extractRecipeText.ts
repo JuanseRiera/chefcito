@@ -1,4 +1,4 @@
-import { JSDOM } from 'jsdom';
+import { parse } from 'node-html-parser';
 import { Logger, type CorrelationId } from '@/lib/infra/Logger';
 
 export function extractRecipeText(
@@ -8,8 +8,7 @@ export function extractRecipeText(
   const logger = Logger.getInstance();
 
   try {
-    const dom = new JSDOM(html);
-    const document = dom.window.document;
+    const document = parse(html);
 
     const noiseSelectors = [
       'script',
@@ -34,11 +33,10 @@ export function extractRecipeText(
     ];
 
     noiseSelectors.forEach((selector) => {
-      const elements = document.querySelectorAll(selector);
-      elements.forEach((el) => el.remove());
+      document.querySelectorAll(selector).forEach((el) => el.remove());
     });
 
-    const textContent = document.body.textContent || '';
+    const textContent = document.querySelector('body')?.textContent || document.textContent || '';
     const cleanedText = textContent.replace(/\s+/g, ' ').trim();
 
     return cleanedText;
