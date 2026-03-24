@@ -32,7 +32,8 @@
     "extracting": "Extrayendo ingredientes...",
     "curating": "Revisando calidad...",
     "retrying": "Re-extrayendo...",
-    "persisting": "Guardando receta..."
+    "persisting": "Guardando receta...",
+    "uploading_image": "Subiendo imagen de la receta..."
   },
   "extractionResult": {
     "success": "¡Receta extraída exitosamente!",

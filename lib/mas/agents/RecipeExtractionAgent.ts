@@ -6,6 +6,7 @@ import type { RecipeExtractionPayload } from '../types/extraction';
 import { extractedRecipeSchema } from '../types/extraction';
 import { fetchHtml } from '@/lib/utils/fetchHtml';
 import { extractRecipeText } from '@/lib/utils/extractRecipeText';
+import { extractRecipeImage } from '@/lib/utils/extractRecipeImage';
 import { sanitizePromptInjection } from '@/lib/utils/sanitizePromptInjection';
 import { generateRecipeParsingPrompt } from '../prompts/recipeParser';
 import { Logger } from '@/lib/infra/Logger';
@@ -25,6 +26,9 @@ export class RecipeExtractionAgent extends Agent {
 
     // Fetch raw HTML from the recipe URL
     const html = await fetchHtml(url, correlationId);
+
+    // Detect recipe image from the raw HTML (og:image or JSON-LD)
+    const imageUrl = extractRecipeImage(html, correlationId);
 
     // Preprocess HTML into minimized text
     const cleanedText = extractRecipeText(html, correlationId);
@@ -78,7 +82,7 @@ export class RecipeExtractionAgent extends Agent {
       to: request.from,
       payload: {
         data: result.data,
-        meta: { correlationId },
+        meta: { correlationId, imageUrl },
       },
       state: this._state,
       timestamp: new Date(),

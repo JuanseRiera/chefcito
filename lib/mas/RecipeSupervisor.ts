@@ -31,7 +31,7 @@ export class RecipeSupervisor extends Supervisor {
   public async runExtractionWorkflow(
     url: string,
     onProgress?: OnProgressCallback,
-  ): Promise<ExtractedRecipe | CuratedRecipe> {
+  ): Promise<{ recipe: ExtractedRecipe | CuratedRecipe; imageUrl: string | null }> {
     return this.orchestrate(
       'recipeExtractionWorkflow',
       { url },
@@ -50,6 +50,7 @@ export class RecipeSupervisor extends Supervisor {
         let rejectionFeedback: string | undefined;
         let attempt = 0;
         let lastExtractedRecipe: ExtractedRecipe | undefined;
+        let lastImageUrl: string | null = null;
 
         while (attempt <= MAX_CURATION_RETRIES) {
           attempt++;
@@ -89,6 +90,11 @@ export class RecipeSupervisor extends Supervisor {
             .data as ExtractedRecipe;
           lastExtractedRecipe = extractedRecipe;
 
+          const imageUrl =
+            (extractionResponse.payload.meta?.imageUrl as string | null) ??
+            null;
+          lastImageUrl = imageUrl;
+
           // --- Stage 2: Curation ---
           onProgress?.('curating', 'Checking recipe quality...');
 
@@ -120,7 +126,7 @@ export class RecipeSupervisor extends Supervisor {
               message: `[Supervisor: ${this.name}] Curation failed, returning extraction without summary: ${curationError instanceof Error ? curationError.message : String(curationError)}`,
               correlationId,
             });
-            return extractedRecipe;
+            return { recipe: extractedRecipe, imageUrl };
           }
 
           if (curationResult.approved) {
@@ -137,7 +143,7 @@ export class RecipeSupervisor extends Supervisor {
               data: { title: extractedRecipe.title },
             });
 
-            return curatedRecipe;
+            return { recipe: curatedRecipe, imageUrl };
           }
 
           // Rejected — feed the reason back for the next extraction attempt
@@ -163,7 +169,7 @@ export class RecipeSupervisor extends Supervisor {
           },
         });
 
-        return lastExtractedRecipe!;
+        return { recipe: lastExtractedRecipe!, imageUrl: lastImageUrl };
       },
     );
   }

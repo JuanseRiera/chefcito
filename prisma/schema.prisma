@@ -21,6 +21,7 @@ model Recipe {
   servings    Int?
   prepTime    Int? // in minutes
   cookTime    Int? // in minutes
+  imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

@@ -25,6 +25,7 @@ export function ExtractionProgress({
     curating: dict.extractionProgress.curating,
     retrying: dict.extractionProgress.retrying,
     persisting: dict.extractionProgress.persisting,
+    uploading_image: dict.extractionProgress.uploading_image,
   };
 
   return (

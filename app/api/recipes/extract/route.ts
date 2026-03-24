@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { createSSEStream } from '@/lib/utils/sseStream';
 import { RecipeSupervisor } from '@/lib/mas/RecipeSupervisor';
 import { getRecipeService } from '@/lib/services/recipeService';
+import { uploadImageFromUrl } from '@/lib/infra/imageStorage';
 import { Logger } from '@/lib/infra/Logger';
 import type { PipelineStage, SSEErrorCode } from '@/lib/types/sse';
 import {
@@ -134,10 +135,8 @@ export async function POST(request: Request) {
         });
       };
 
-      const result = await supervisor.runExtractionWorkflow(
-        originalUrl,
-        onProgress,
-      );
+      const { recipe: result, imageUrl } =
+        await supervisor.runExtractionWorkflow(originalUrl, onProgress);
 
       // 3. Persistence
       onProgress('persisting', 'Saving your recipe...');
@@ -147,7 +146,17 @@ export async function POST(request: Request) {
         originalUrl,
       );
 
-      // 4. Final Success Event
+      // 4. Image Upload
+      if (imageUrl) {
+        onProgress('uploading_image', 'Uploading recipe image...');
+        const publicUrl = await uploadImageFromUrl(imageUrl, persistedRecipe.id);
+        if (publicUrl) {
+          await recipeService.updateRecipeImage(persistedRecipe.id, publicUrl);
+          persistedRecipe.imageUrl = publicUrl;
+        }
+      }
+
+      // 5. Final Success Event
       enqueue({ event: 'result', data: { recipe: persistedRecipe } });
     } catch (error) {
       const sseError = mapErrorToSSE(error);
