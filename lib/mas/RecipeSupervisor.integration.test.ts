@@ -5,10 +5,7 @@ import type {
   ExtractedRecipe,
   CuratedRecipe,
 } from '@/lib/mas/types/extraction';
-import {
-  makeExtractedRecipe,
-  makeCuratedRecipe,
-} from '@/tests/helpers/factories';
+import { makeExtractedRecipe } from '@/tests/helpers/factories';
 
 // vi.hoisted ensures these are available when vi.mock factories run (hoisted).
 const { mockGetCompletion, mockExtractionProcess, mockCurationProcess } =

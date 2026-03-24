@@ -33,6 +33,21 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
   const lang = useLocale();
   const labels = getRecipeLabels(recipe.language ?? 'en');
 
+  const allTags = [];
+  if (recipe.servings != null) {
+    allTags.push(`${recipe.servings} ${labels.servings}`);
+  }
+  if (recipe.prepTime != null) {
+    allTags.push(`${recipe.prepTime} ${labels.minPrep}`);
+  }
+  if (recipe.cookTime != null) {
+    allTags.push(`${recipe.cookTime} ${labels.minCook}`);
+  }
+  allTags.push(`${recipe._count.ingredients} ${labels.ingredients}`);
+
+  const visibleTags = allTags.slice(0, 2);
+  const hiddenCount = allTags.length - visibleTags.length;
+
   return (
     <Link href={`/${lang}/recipes/${recipe.id}`} className="block group">
       <Card className="h-full overflow-hidden transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-lg">
@@ -73,32 +88,28 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
 
         <CardContent className="pb-2">
           {recipe.description && (
-            <p className="text-brown-light text-sm line-clamp-2">
+            <p className="text-brown-light text-sm line-clamp-4">
               {recipe.description}
             </p>
           )}
         </CardContent>
 
         <CardFooter>
-          <div className="flex flex-wrap gap-2">
-            {recipe.servings != null && (
-              <Badge variant="secondary" className="text-xs">
-                {recipe.servings} {labels.servings}
+          <div className="flex flex-nowrap items-center gap-2 overflow-hidden w-full">
+            {visibleTags.map((tag, i) => (
+              <Badge
+                key={i}
+                variant="secondary"
+                className="text-xs shrink-0 truncate"
+              >
+                {tag}
+              </Badge>
+            ))}
+            {hiddenCount > 0 && (
+              <Badge variant="secondary" className="text-xs shrink-0">
+                +{hiddenCount}
               </Badge>
             )}
-            {recipe.prepTime != null && (
-              <Badge variant="secondary" className="text-xs">
-                {recipe.prepTime} {labels.minPrep}
-              </Badge>
-            )}
-            {recipe.cookTime != null && (
-              <Badge variant="secondary" className="text-xs">
-                {recipe.cookTime} {labels.minCook}
-              </Badge>
-            )}
-            <Badge variant="secondary" className="text-xs">
-              {recipe._count.ingredients} {labels.ingredients}
-            </Badge>
           </div>
         </CardFooter>
       </Card>
