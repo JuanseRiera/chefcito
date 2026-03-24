@@ -77,7 +77,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
 
         <CardContent className="pb-2">
           {recipe.description && (
-            <p className="text-brown-light text-sm line-clamp-2">
+            <p className="text-brown-light text-sm line-clamp-4">
               {recipe.description}
             </p>
           )}
