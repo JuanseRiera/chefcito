@@ -3,7 +3,7 @@
 import { createContext, useContext } from 'react';
 import type { Dictionary } from '@/app/[lang]/dictionaries';
 
-const DictionaryContext = createContext<Dictionary | null>(null);
+export const DictionaryContext = createContext<Dictionary | null>(null);
 
 export function DictionaryProvider({
   dictionary,
