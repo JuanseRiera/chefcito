@@ -13,10 +13,12 @@ import {
   LLMRateLimitError,
   CircuitBreakerOpenError,
 } from '@/lib/mas/types/exceptions';
+import type { CuratedRecipe, ExtractedRecipe } from '@/lib/mas/types/extraction';
 
-// vi.hoisted ensures the mock fn is available when vi.mock factory runs.
-const { mockRunExtractionWorkflow } = vi.hoisted(() => ({
+// vi.hoisted ensures mock fns are available when vi.mock factories run.
+const { mockRunExtractionWorkflow, mockUploadImageFromUrl } = vi.hoisted(() => ({
   mockRunExtractionWorkflow: vi.fn(),
+  mockUploadImageFromUrl: vi.fn(),
 }));
 
 // Mock RecipeSupervisor so no LLM calls are made.
@@ -26,6 +28,19 @@ vi.mock('@/lib/mas/RecipeSupervisor', () => ({
     return { runExtractionWorkflow: mockRunExtractionWorkflow };
   },
 }));
+
+// Mock imageStorage so no real HTTP calls are made in E2E tests.
+vi.mock('@/lib/infra/imageStorage', () => ({
+  uploadImageFromUrl: mockUploadImageFromUrl,
+}));
+
+// Helper: wrap a recipe in the { recipe, imageUrl } shape the supervisor now returns.
+function supervisorResult(
+  recipe: CuratedRecipe | ExtractedRecipe,
+  imageUrl: string | null = null,
+) {
+  return { recipe, imageUrl };
+}
 
 // Import handler AFTER mocks are registered (Vitest hoists vi.mock calls).
 import { POST } from '@/app/api/recipes/extract/route';
@@ -62,7 +77,9 @@ describe('POST /api/recipes/extract (E2E)', () => {
 
   describe('happy path: curated recipe', () => {
     it('responds with Content-Type: text/event-stream', async () => {
-      mockRunExtractionWorkflow.mockResolvedValue(makeCuratedRecipe());
+      mockRunExtractionWorkflow.mockResolvedValue(
+        supervisorResult(makeCuratedRecipe()),
+      );
 
       const response = await POST(
         makeRequest({ url: 'https://example.com/recipe' }),
@@ -72,7 +89,9 @@ describe('POST /api/recipes/extract (E2E)', () => {
     });
 
     it('emits progress events followed by a final result event', async () => {
-      mockRunExtractionWorkflow.mockResolvedValue(makeCuratedRecipe());
+      mockRunExtractionWorkflow.mockResolvedValue(
+        supervisorResult(makeCuratedRecipe()),
+      );
 
       const response = await POST(
         makeRequest({ url: 'https://example.com/recipe' }),
@@ -87,7 +106,7 @@ describe('POST /api/recipes/extract (E2E)', () => {
 
     it('persists the recipe to the database before emitting result', async () => {
       const curated = makeCuratedRecipe();
-      mockRunExtractionWorkflow.mockResolvedValue(curated);
+      mockRunExtractionWorkflow.mockResolvedValue(supervisorResult(curated));
 
       const response = await POST(
         makeRequest({ url: 'https://example.com/recipe' }),
@@ -105,7 +124,9 @@ describe('POST /api/recipes/extract (E2E)', () => {
     });
 
     it('includes the persisted recipe (with db-generated id) in the result event', async () => {
-      mockRunExtractionWorkflow.mockResolvedValue(makeCuratedRecipe());
+      mockRunExtractionWorkflow.mockResolvedValue(
+        supervisorResult(makeCuratedRecipe()),
+      );
 
       const response = await POST(
         makeRequest({ url: 'https://example.com/recipe' }),
@@ -120,7 +141,7 @@ describe('POST /api/recipes/extract (E2E)', () => {
 
     it('includes ingredients and instructionSteps in the result event recipe', async () => {
       const curated = makeCuratedRecipe();
-      mockRunExtractionWorkflow.mockResolvedValue(curated);
+      mockRunExtractionWorkflow.mockResolvedValue(supervisorResult(curated));
 
       const response = await POST(
         makeRequest({ url: 'https://example.com/recipe' }),
@@ -141,7 +162,7 @@ describe('POST /api/recipes/extract (E2E)', () => {
   describe('happy path: uncurated (raw extraction)', () => {
     it('still persists and emits result when supervisor returns ExtractedRecipe', async () => {
       const extracted = makeExtractedRecipe();
-      mockRunExtractionWorkflow.mockResolvedValue(extracted);
+      mockRunExtractionWorkflow.mockResolvedValue(supervisorResult(extracted));
 
       const response = await POST(
         makeRequest({ url: 'https://example.com/recipe' }),
@@ -253,6 +274,86 @@ describe('POST /api/recipes/extract (E2E)', () => {
 
       const count = await prisma.recipe.count();
       expect(count).toBe(0);
+    });
+  });
+
+  describe('image upload', () => {
+    it('emits uploading_image progress stage and stores imageUrl when image is found', async () => {
+      const curated = makeCuratedRecipe();
+      const sourceImageUrl = 'https://example.com/photo.jpg';
+      const publicUrl = 'https://abc.supabase.co/storage/v1/object/public/recipe-images/recipes/test-id.jpg';
+      mockRunExtractionWorkflow.mockResolvedValue(
+        supervisorResult(curated, sourceImageUrl),
+      );
+      mockUploadImageFromUrl.mockResolvedValue(publicUrl);
+
+      const response = await POST(
+        makeRequest({ url: 'https://example.com/recipe' }),
+      );
+      const events = await consumeSSEStream(response.body!);
+
+      const stages = events
+        .filter((e) => e.event === 'progress')
+        .map((e) => (e.data as { stage: string }).stage);
+      expect(stages).toContain('uploading_image');
+
+      const resultEvent = getEvent(events, 'result')!;
+      const data = resultEvent.data as { recipe: { imageUrl: string } };
+      expect(data.recipe.imageUrl).toBe(publicUrl);
+    });
+
+    it('persists imageUrl to the database when upload succeeds', async () => {
+      const curated = makeCuratedRecipe();
+      const publicUrl = 'https://abc.supabase.co/storage/v1/object/public/recipe-images/recipes/test-id.jpg';
+      mockRunExtractionWorkflow.mockResolvedValue(
+        supervisorResult(curated, 'https://example.com/photo.jpg'),
+      );
+      mockUploadImageFromUrl.mockResolvedValue(publicUrl);
+
+      const response = await POST(
+        makeRequest({ url: 'https://example.com/recipe' }),
+      );
+      await consumeSSEStream(response.body!);
+
+      const [saved] = await prisma.recipe.findMany();
+      expect(saved.imageUrl).toBe(publicUrl);
+    });
+
+    it('skips uploading_image stage and leaves imageUrl null when supervisor returns no imageUrl', async () => {
+      mockRunExtractionWorkflow.mockResolvedValue(
+        supervisorResult(makeCuratedRecipe(), null),
+      );
+
+      const response = await POST(
+        makeRequest({ url: 'https://example.com/recipe' }),
+      );
+      const events = await consumeSSEStream(response.body!);
+
+      const stages = events
+        .filter((e) => e.event === 'progress')
+        .map((e) => (e.data as { stage: string }).stage);
+      expect(stages).not.toContain('uploading_image');
+      expect(mockUploadImageFromUrl).not.toHaveBeenCalled();
+    });
+
+    it('still emits result and saves recipe when uploadImageFromUrl returns null (upload failed)', async () => {
+      const curated = makeCuratedRecipe();
+      mockRunExtractionWorkflow.mockResolvedValue(
+        supervisorResult(curated, 'https://example.com/photo.jpg'),
+      );
+      mockUploadImageFromUrl.mockResolvedValue(null);
+
+      const response = await POST(
+        makeRequest({ url: 'https://example.com/recipe' }),
+      );
+      const events = await consumeSSEStream(response.body!);
+
+      const resultEvent = getEvent(events, 'result');
+      expect(resultEvent).toBeDefined();
+
+      const [saved] = await prisma.recipe.findMany();
+      expect(saved.title).toBe(curated.title);
+      expect(saved.imageUrl).toBeNull();
     });
   });
 });
