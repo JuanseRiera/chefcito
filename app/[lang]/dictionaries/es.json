@@ -1,7 +1,8 @@
 {
   "nav": {
     "myRecipes": "Mis Recetas",
-    "extractRecipe": "Extraer Receta"
+    "extractRecipe": "Extraer Receta",
+    "createRecipe": "Crear Receta"
   },
   "footer": {
     "tagline": "Tu asistente de cocina con inteligencia artificial"
@@ -11,7 +12,8 @@
     "emptyState": "Aún no hay recetas. ¡Extrae tu primera receta para comenzar!",
     "extractCta": "Extraer una Receta",
     "yourRecipes": "Tus Recetas",
-    "extractButton": "+ Extraer Receta"
+    "extractButton": "+ Extraer Receta",
+    "createButton": "+ Crear Receta"
   },
   "extract": {
     "title": "Extraer una Receta",
@@ -71,5 +73,16 @@
   "mobileNav": {
     "closeMenu": "Cerrar menú",
     "openMenu": "Abrir menú"
+  },
+  "recipeCreation": {
+    "title": "Crear una Receta con IA",
+    "subtitle": "Describí tu receta en texto libre y la estructuramos por vos.",
+    "placeholder": "Empezá describiendo tu receta. Por ejemplo: \"Spaghetti carbonara clásico: pasta, huevos, guanciale, pecorino, pimienta negra...\"",
+    "inputPlaceholder": "Describí tu receta o respondé las preguntas de arriba…",
+    "inputAriaLabel": "Mensaje de receta",
+    "send": "Enviar",
+    "sending": "Enviando…",
+    "viewRecipe": "Ver Receta",
+    "createAnother": "Crear Otra"
   }
 }

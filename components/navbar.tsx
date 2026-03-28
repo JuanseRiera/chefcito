@@ -14,6 +14,7 @@ export function Navbar({ dict, lang }: NavbarProps) {
   const navLinks = [
     { href: `/${lang}/`, label: dict.nav.myRecipes },
     { href: `/${lang}/extract`, label: dict.nav.extractRecipe },
+    { href: `/${lang}/create`, label: dict.nav.createRecipe },
   ];
 
   return (

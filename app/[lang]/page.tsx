@@ -43,9 +43,14 @@ export default async function HomePage({
         <h1 className="font-serif text-3xl text-charcoal">
           {dict.home.yourRecipes}
         </h1>
-        <LinkButton href={`/${lang}/extract`} variant="outline" size="sm">
-          {dict.home.extractButton}
-        </LinkButton>
+        <div className="flex gap-2">
+          <LinkButton href={`/${lang}/create`} size="sm">
+            {dict.home.createButton}
+          </LinkButton>
+          <LinkButton href={`/${lang}/extract`} variant="outline" size="sm">
+            {dict.home.extractButton}
+          </LinkButton>
+        </div>
       </div>
       <RecipeCardGrid recipes={recipes} />
     </div>

@@ -1,7 +1,8 @@
 {
   "nav": {
     "myRecipes": "My Recipes",
-    "extractRecipe": "Extract Recipe"
+    "extractRecipe": "Extract Recipe",
+    "createRecipe": "Create Recipe"
   },
   "footer": {
     "tagline": "Your AI-powered cooking companion"
@@ -11,7 +12,8 @@
     "emptyState": "No recipes yet. Extract your first recipe to get started!",
     "extractCta": "Extract a Recipe",
     "yourRecipes": "Your Recipes",
-    "extractButton": "+ Extract Recipe"
+    "extractButton": "+ Extract Recipe",
+    "createButton": "+ Create Recipe"
   },
   "extract": {
     "title": "Extract a Recipe",
@@ -71,5 +73,16 @@
   "mobileNav": {
     "closeMenu": "Close menu",
     "openMenu": "Open menu"
+  },
+  "recipeCreation": {
+    "title": "Create a Recipe with AI",
+    "subtitle": "Describe your recipe in plain text and we'll structure it for you.",
+    "placeholder": "Start by describing your recipe. For example: \"Classic spaghetti carbonara: pasta, eggs, guanciale, pecorino, black pepper...\"",
+    "inputPlaceholder": "Describe your recipe or answer the questions above…",
+    "inputAriaLabel": "Recipe message",
+    "send": "Send",
+    "sending": "Sending…",
+    "viewRecipe": "View Recipe",
+    "createAnother": "Create Another"
   }
 }
