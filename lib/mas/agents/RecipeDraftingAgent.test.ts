@@ -57,6 +57,7 @@ describe('RecipeDraftingAgent', () => {
     message: 'Test Cake: 1 cup flour. Mix and bake.',
     currentDraft: {},
     previousQuestions: [],
+    conversationHistory: [],
     iterationCount: 0,
     appLanguage: 'en',
     sourceLanguage: null,

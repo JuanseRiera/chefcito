@@ -65,6 +65,18 @@ vi.mock('@/lib/utils/sanitizePromptInjection', () => ({
   sanitizePromptInjection: vi.fn((text: string) => text),
 }));
 
+vi.mock('@/app/[lang]/dictionaries', () => ({
+  getDictionary: vi.fn().mockResolvedValue({
+    recipeCreationSupervisor: {
+      messageBlocked: 'Message blocked.',
+      maxRoundsReached: 'Max rounds reached.',
+      notARecipe: 'Not a recipe.',
+      needMoreInfo: 'Need more info.',
+      recipeCreated: 'Recipe "{title}" saved!',
+    },
+  }),
+}));
+
 import { RecipeCreationSupervisor } from './RecipeCreationSupervisor';
 
 // ---- Helpers ----
@@ -139,6 +151,7 @@ describe('RecipeCreationSupervisor', () => {
       missingFields: [],
       lastQuestions: [],
       lastUserMessage: null,
+      conversationHistory: [],
       confidence: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -227,6 +240,7 @@ describe('RecipeCreationSupervisor', () => {
       missingFields: ['ingredients'],
       lastQuestions: ['What are the ingredients?'],
       lastUserMessage: 'prev msg',
+      conversationHistory: [],
       confidence: 0.3,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -251,6 +265,7 @@ describe('RecipeCreationSupervisor', () => {
       missingFields: ['ingredients'],
       lastQuestions: ['What are the ingredients?'],
       lastUserMessage: 'Cake',
+      conversationHistory: [],
       confidence: 0.3,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -280,6 +295,7 @@ describe('RecipeCreationSupervisor', () => {
       missingFields: [],
       lastQuestions: [],
       lastUserMessage: 'cake',
+      conversationHistory: [],
       confidence: 0.5,
       createdAt: new Date(),
       updatedAt: new Date(),
