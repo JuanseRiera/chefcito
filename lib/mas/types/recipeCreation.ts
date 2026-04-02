@@ -7,13 +7,13 @@ import { z } from 'zod';
 export const draftIngredientSchema = z.object({
   quantity: z.number().nullable(),
   unit: z.string().nullable(),
-  name: z.string().nonempty(),
+  name: z.string().min(1),
   category: z.string().nullable(),
 });
 
 export const draftInstructionStepSchema = z.object({
   stepNumber: z.number().int().positive(),
-  instruction: z.string().nonempty(),
+  instruction: z.string().min(1),
 });
 
 // ---------------------------------------------------------------------------
@@ -56,16 +56,16 @@ export type DraftingAgentOutput = z.infer<typeof draftingAgentOutputSchema>;
 // ---------------------------------------------------------------------------
 
 export const finalizerRecipeSchema = z.object({
-  language: z.string().nonempty(),
-  title: z.string().nonempty(),
-  description: z.string().nonempty(),
+  language: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
   servings: z.number().int().nullable(),
   prepTime: z.number().int().nullable(),
   cookTime: z.number().int().nullable(),
   author: z.string().nullable(),
   originalUrl: z.string().nullable(),
-  ingredients: z.array(draftIngredientSchema).nonempty(),
-  instructionSteps: z.array(draftInstructionStepSchema).nonempty(),
+  ingredients: z.array(draftIngredientSchema).min(1),
+  instructionSteps: z.array(draftInstructionStepSchema).min(1),
 });
 
 export type FinalizerRecipe = z.infer<typeof finalizerRecipeSchema>;
@@ -77,6 +77,17 @@ export const finalizerAgentOutputSchema = z.object({
 });
 
 export type FinalizerAgentOutput = z.infer<typeof finalizerAgentOutputSchema>;
+
+// ---------------------------------------------------------------------------
+// Conversation history
+// ---------------------------------------------------------------------------
+
+export const conversationTurnSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string(),
+});
+
+export type ConversationTurn = z.infer<typeof conversationTurnSchema>;
 
 // ---------------------------------------------------------------------------
 // Session model (raw SQL result shape)
@@ -92,6 +103,7 @@ export interface RecipeCreationSession {
   missingFields: string[];
   lastQuestions: string[];
   lastUserMessage: string | null;
+  conversationHistory: ConversationTurn[];
   confidence: number;
   createdAt: Date;
   updatedAt: Date;
@@ -103,7 +115,7 @@ export interface RecipeCreationSession {
 // ---------------------------------------------------------------------------
 
 export const createFromTextRequestSchema = z.object({
-  message: z.string().min(1, 'Message cannot be empty').max(5000, 'Message too long'),
+  message: z.string().min(1).max(5000),
   sessionId: z.string().optional(),
   appLanguage: z.enum(['en', 'es']),
 });
@@ -127,6 +139,7 @@ export interface DraftingAgentPayload {
   message: string;
   currentDraft: WorkingDraft;
   previousQuestions: string[];
+  conversationHistory: ConversationTurn[];
   iterationCount: number;
   appLanguage: string;
   sourceLanguage: string | null;

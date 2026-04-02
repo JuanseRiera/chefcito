@@ -74,6 +74,13 @@
     "closeMenu": "Close menu",
     "openMenu": "Open menu"
   },
+  "recipeCreationSupervisor": {
+    "messageBlocked": "Your message was blocked for security reasons. Please enter a recipe description.",
+    "maxRoundsReached": "Maximum clarification rounds reached. Please start over with a fuller recipe description that includes a title, ingredients, and steps.",
+    "notARecipe": "I couldn't understand your message as a recipe. Please try again with a valid recipe description.",
+    "needMoreInfo": "I need a bit more information to complete the recipe. Can you add the missing preparation steps or ingredients?",
+    "recipeCreated": "Your recipe \"{title}\" was saved successfully!"
+  },
   "recipeCreation": {
     "title": "Create a Recipe with AI",
     "subtitle": "Describe your recipe in plain text and we'll structure it for you.",

@@ -1,17 +1,16 @@
+import { z } from 'zod';
 import type { PrismaClient } from '@/prisma/generated/client';
-import { Prisma } from '@/prisma/generated/client';
-import type { RecipeCreationSession, WorkingDraft } from '@/lib/mas/types/recipeCreation';
+import {
+  workingDraftSchema,
+  conversationTurnSchema,
+} from '@/lib/mas/types/recipeCreation';
+import type { RecipeCreationSession, WorkingDraft, ConversationTurn } from '@/lib/mas/types/recipeCreation';
 import { Logger } from '@/lib/infra/Logger';
 
 const SESSION_TTL_HOURS = 24;
 
 const logger = Logger.getInstance();
 
-/**
- * Repository for RecipeCreationSession using raw SQL.
- * The Prisma client cannot be regenerated in this environment, so we use
- * $queryRaw / $executeRaw directly with manually-defined TypeScript types.
- */
 export class RecipeCreationSessionRepository {
   constructor(private prisma: PrismaClient) {}
 
@@ -19,95 +18,75 @@ export class RecipeCreationSessionRepository {
     appLanguage: string;
     lastUserMessage: string;
   }): Promise<RecipeCreationSession> {
-    const id = generateCuid();
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + SESSION_TTL_HOURS * 60 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + SESSION_TTL_HOURS * 60 * 60 * 1000);
 
-    await this.prisma.$executeRaw`
-      INSERT INTO "RecipeCreationSession"
-        ("id", "status", "appLanguage", "sourceLanguage", "iterationCount",
-         "workingDraft", "missingFields", "lastQuestions", "lastUserMessage",
-         "confidence", "createdAt", "updatedAt", "expiresAt")
-      VALUES
-        (${id}, 'collecting', ${data.appLanguage}, NULL, 0,
-         ${Prisma.raw("'{}'")}::jsonb, ${Prisma.raw("'[]'")}::jsonb, ${Prisma.raw("'[]'")}::jsonb,
-         ${data.lastUserMessage}, 0, ${now}::timestamptz, ${now}::timestamptz, ${expiresAt}::timestamptz)
-    `;
+    const row = await this.prisma.recipeCreationSession.create({
+      data: {
+        appLanguage: data.appLanguage,
+        lastUserMessage: data.lastUserMessage,
+        expiresAt,
+        workingDraft: {},
+        missingFields: [],
+        lastQuestions: [],
+        conversationHistory: [],
+      },
+    });
 
-    const session = await this.findById(id);
-    if (!session) throw new Error('Failed to create session');
-    return session;
+    return mapRow(row);
   }
 
   async findById(id: string): Promise<RecipeCreationSession | null> {
-    const rows = await this.prisma.$queryRaw<RawSessionRow[]>`
-      SELECT * FROM "RecipeCreationSession" WHERE "id" = ${id} LIMIT 1
-    `;
-    if (rows.length === 0) return null;
-    return mapRow(rows[0]);
+    const row = await this.prisma.recipeCreationSession.findUnique({
+      where: { id },
+    });
+    if (!row) return null;
+    return mapRow(row);
   }
 
   async update(
     id: string,
     data: Partial<{
       status: RecipeCreationSession['status'];
-      sourceLanguage: string;
+      sourceLanguage: string | null;
       iterationCount: number;
       workingDraft: WorkingDraft;
       missingFields: string[];
       lastQuestions: string[];
       lastUserMessage: string;
+      conversationHistory: ConversationTurn[];
       confidence: number;
     }>,
   ): Promise<void> {
-    const now = new Date();
-    const setClauses: string[] = ['"updatedAt" = ' + sqlEscape(now.toISOString())];
-
-    if (data.status !== undefined) {
-      setClauses.push('"status" = ' + sqlString(data.status));
-    }
-    if (data.sourceLanguage !== undefined) {
-      setClauses.push('"sourceLanguage" = ' + sqlString(data.sourceLanguage));
-    }
-    if (data.iterationCount !== undefined) {
-      setClauses.push('"iterationCount" = ' + data.iterationCount);
-    }
-    if (data.workingDraft !== undefined) {
-      setClauses.push('"workingDraft" = ' + sqlJsonb(data.workingDraft));
-    }
-    if (data.missingFields !== undefined) {
-      setClauses.push('"missingFields" = ' + sqlJsonb(data.missingFields));
-    }
-    if (data.lastQuestions !== undefined) {
-      setClauses.push('"lastQuestions" = ' + sqlJsonb(data.lastQuestions));
-    }
-    if (data.lastUserMessage !== undefined) {
-      setClauses.push('"lastUserMessage" = ' + sqlString(data.lastUserMessage));
-    }
-    if (data.confidence !== undefined) {
-      setClauses.push('"confidence" = ' + data.confidence);
-    }
-
-    const query = `UPDATE "RecipeCreationSession" SET ${setClauses.join(', ')} WHERE "id" = ${sqlString(id)}`;
-    await this.prisma.$executeRawUnsafe(query);
+    await this.prisma.recipeCreationSession.update({
+      where: { id },
+      data: {
+        ...(data.status !== undefined && { status: data.status }),
+        ...(data.sourceLanguage !== undefined && { sourceLanguage: data.sourceLanguage }),
+        ...(data.iterationCount !== undefined && { iterationCount: data.iterationCount }),
+        ...(data.workingDraft !== undefined && { workingDraft: data.workingDraft }),
+        ...(data.missingFields !== undefined && { missingFields: data.missingFields }),
+        ...(data.lastQuestions !== undefined && { lastQuestions: data.lastQuestions }),
+        ...(data.lastUserMessage !== undefined && { lastUserMessage: data.lastUserMessage }),
+        ...(data.conversationHistory !== undefined && { conversationHistory: data.conversationHistory }),
+        ...(data.confidence !== undefined && { confidence: data.confidence }),
+      },
+    });
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.$executeRaw`
-      DELETE FROM "RecipeCreationSession" WHERE "id" = ${id}
-    `;
+    await this.prisma.recipeCreationSession.delete({ where: { id } });
   }
 
   async deleteExpired(): Promise<number> {
-    const result = await this.prisma.$executeRaw`
-      DELETE FROM "RecipeCreationSession" WHERE "expiresAt" < NOW()
-    `;
+    const result = await this.prisma.recipeCreationSession.deleteMany({
+      where: { expiresAt: { lt: new Date() } },
+    });
     logger.log({
       timestamp: '',
       level: 'info',
-      message: `[RecipeCreationSessionRepository] Deleted ${result} expired sessions`,
+      message: `[RecipeCreationSessionRepository] Deleted ${result.count} expired sessions`,
     });
-    return result;
+    return result.count;
   }
 }
 
@@ -115,65 +94,29 @@ export class RecipeCreationSessionRepository {
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-interface RawSessionRow {
-  id: string;
-  status: string;
-  appLanguage: string;
-  sourceLanguage: string | null;
-  iterationCount: number;
-  workingDraft: unknown;
-  missingFields: unknown;
-  lastQuestions: unknown;
-  lastUserMessage: string | null;
-  confidence: number;
-  createdAt: Date;
-  updatedAt: Date;
-  expiresAt: Date;
-}
+type PrismaSessionRow = Awaited<
+  ReturnType<PrismaClient['recipeCreationSession']['findUniqueOrThrow']>
+>;
 
-function mapRow(row: RawSessionRow): RecipeCreationSession {
+const sessionStatusSchema = z.enum(['collecting', 'ready_to_save', 'completed', 'abandoned']);
+const stringArraySchema = z.array(z.string());
+const conversationHistorySchema = z.array(conversationTurnSchema);
+
+function mapRow(row: PrismaSessionRow): RecipeCreationSession {
   return {
     id: row.id,
-    status: row.status as RecipeCreationSession['status'],
+    status: sessionStatusSchema.parse(row.status),
     appLanguage: row.appLanguage,
     sourceLanguage: row.sourceLanguage,
-    iterationCount: Number(row.iterationCount),
-    workingDraft: (typeof row.workingDraft === 'string'
-      ? JSON.parse(row.workingDraft)
-      : row.workingDraft) as WorkingDraft,
-    missingFields: (typeof row.missingFields === 'string'
-      ? JSON.parse(row.missingFields)
-      : row.missingFields) as string[],
-    lastQuestions: (typeof row.lastQuestions === 'string'
-      ? JSON.parse(row.lastQuestions)
-      : row.lastQuestions) as string[],
+    iterationCount: row.iterationCount,
+    workingDraft: workingDraftSchema.parse(row.workingDraft ?? {}),
+    missingFields: stringArraySchema.parse(row.missingFields ?? []),
+    lastQuestions: stringArraySchema.parse(row.lastQuestions ?? []),
     lastUserMessage: row.lastUserMessage,
-    confidence: Number(row.confidence),
+    conversationHistory: conversationHistorySchema.parse(row.conversationHistory ?? []),
+    confidence: row.confidence,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     expiresAt: row.expiresAt,
   };
-}
-
-/** Simple CUID-like unique id generator. */
-function generateCuid(): string {
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).slice(2, 9);
-  return `c${timestamp}${random}`;
-}
-
-/** Escape a value as a SQL string literal (single-quoted, escaped). */
-function sqlString(value: string): string {
-  return "'" + value.replace(/'/g, "''") + "'";
-}
-
-/** Serialize a value as an escaped SQL JSONB literal. */
-function sqlJsonb(value: unknown): string {
-  const json = JSON.stringify(value).replace(/'/g, "''");
-  return "'" + json + "'::jsonb";
-}
-
-/** Wrap a string as a SQL timestamp literal. */
-function sqlEscape(value: string): string {
-  return "'" + value.replace(/'/g, "''") + "'::timestamptz";
 }

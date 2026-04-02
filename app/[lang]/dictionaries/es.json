@@ -74,6 +74,13 @@
     "closeMenu": "Cerrar menú",
     "openMenu": "Abrir menú"
   },
+  "recipeCreationSupervisor": {
+    "messageBlocked": "Tu mensaje fue bloqueado por razones de seguridad. Por favor ingresá una descripción de receta.",
+    "maxRoundsReached": "Se alcanzó el límite de preguntas. Por favor, escribí una descripción más completa de tu receta con título, ingredientes y pasos.",
+    "notARecipe": "No pude entender tu mensaje como una receta. Por favor, intentá de nuevo con una descripción de receta válida.",
+    "needMoreInfo": "Necesito un poco más de información para completar la receta. ¿Podés agregar los pasos de preparación o ingredientes faltantes?",
+    "recipeCreated": "¡Tu receta \"{title}\" fue guardada exitosamente!"
+  },
   "recipeCreation": {
     "title": "Crear una Receta con IA",
     "subtitle": "Describí tu receta en texto libre y la estructuramos por vos.",

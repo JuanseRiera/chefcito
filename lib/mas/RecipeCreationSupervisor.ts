@@ -8,16 +8,22 @@ import type {
   DraftingAgentPayload,
   DraftingAgentOutput,
   FinalizerAgentPayload,
-  FinalizerAgentOutput,
   RecipeCreationSession,
   CreateFromTextResponse,
   WorkingDraft,
+  ConversationTurn,
 } from './types/recipeCreation';
+import {
+  draftingAgentOutputSchema,
+  finalizerAgentOutputSchema,
+} from './types/recipeCreation';
+import { MASError } from './types/exceptions';
 import { sanitizePromptInjection } from '@/lib/utils/sanitizePromptInjection';
 import { getRecipeService } from '@/lib/services/recipeService';
 import { RecipeCreationSessionRepository } from '@/lib/services/recipeCreationSessionRepository';
 import { getPrisma } from '@/lib/db/prisma';
 import { Logger } from '@/lib/infra/Logger';
+import { getDictionary } from '@/app/[lang]/dictionaries';
 
 const MAX_ITERATIONS = 3;
 const CONFIDENCE_THRESHOLD = 0.7;
@@ -46,6 +52,8 @@ export class RecipeCreationSupervisor extends Supervisor {
       { message, sessionId, appLanguage },
       async (correlationId) => {
         const logger = Logger.getInstance();
+        const dict = await getDictionary(appLanguage);
+        const labels = dict.recipeCreationSupervisor;
 
         // ----- Fetch or initialize session -----
         let session: RecipeCreationSession | null = null;
@@ -64,10 +72,7 @@ export class RecipeCreationSupervisor extends Supervisor {
         // ----- Sanitize input (Layer 1) -----
         const sanitized = sanitizePromptInjection(message, correlationId);
         if (!sanitized) {
-          return this.buildRejectedResponse(
-            session,
-            'Your message was blocked for security reasons. Please enter a recipe description.',
-          );
+          return this.buildRejectedResponse(session, labels.messageBlocked);
         }
 
         // ----- Enforce iteration cap -----
@@ -78,20 +83,18 @@ export class RecipeCreationSupervisor extends Supervisor {
           }
           return {
             status: 'rejected',
-            messages: [
-              appLanguage === 'es'
-                ? 'Se alcanzó el límite de preguntas. Por favor, escribí una descripción más completa de tu receta con título, ingredientes y pasos.'
-                : 'Maximum clarification rounds reached. Please start over with a fuller recipe description that includes a title, ingredients, and steps.',
-            ],
+            messages: [labels.maxRoundsReached],
           };
         }
 
         // ----- Call DraftingAgent -----
-        const draftingAgent = this.getAgent('RecipeDraftingAgent')!;
+        const draftingAgent = this.getAgent('RecipeDraftingAgent');
+        if (!draftingAgent) throw new MASError('RecipeDraftingAgent is not registered');
         const draftingPayload: DraftingAgentPayload = {
           message: sanitized,
           currentDraft: session?.workingDraft ?? {},
           previousQuestions: session?.lastQuestions ?? [],
+          conversationHistory: session?.conversationHistory ?? [],
           iterationCount: currentIterations,
           appLanguage,
           sourceLanguage: session?.sourceLanguage ?? null,
@@ -107,16 +110,13 @@ export class RecipeCreationSupervisor extends Supervisor {
         };
 
         const draftingResponse: AgentResponse = await draftingAgent.process(draftingRequest);
-        const draftingOutput = draftingResponse.payload.data as DraftingAgentOutput;
+        const draftingOutput = draftingAgentOutputSchema.parse(draftingResponse.payload.data);
 
         // ----- Branch on action -----
         if (draftingOutput.action === 'reject' || draftingOutput.safetyFlags.length > 0) {
           return this.buildRejectedResponse(
             session,
-            draftingOutput.reason ??
-              (appLanguage === 'es'
-                ? 'No pude entender tu mensaje como una receta. Por favor, intentá de nuevo con una descripción de receta válida.'
-                : "I couldn't understand your message as a recipe. Please try again with a valid recipe description."),
+            draftingOutput.reason ?? labels.notARecipe,
           );
         }
 
@@ -136,7 +136,8 @@ export class RecipeCreationSupervisor extends Supervisor {
         }
 
         // action === 'create_recipe' — call finalizer
-        const finalizerAgent = this.getAgent('RecipeFinalizerAgent')!;
+        const finalizerAgent = this.getAgent('RecipeFinalizerAgent');
+        if (!finalizerAgent) throw new MASError('RecipeFinalizerAgent is not registered');
         const finalizerPayload: FinalizerAgentPayload = {
           draft: draftingOutput.draft,
           sourceLanguage: draftingOutput.sourceLanguage,
@@ -153,7 +154,7 @@ export class RecipeCreationSupervisor extends Supervisor {
         };
 
         const finalizerResponse: AgentResponse = await finalizerAgent.process(finalizerRequest);
-        const finalizerOutput = finalizerResponse.payload.data as FinalizerAgentOutput;
+        const finalizerOutput = finalizerAgentOutputSchema.parse(finalizerResponse.payload.data);
 
         // ----- Save guard -----
         const { recipe } = finalizerOutput;
@@ -183,11 +184,7 @@ export class RecipeCreationSupervisor extends Supervisor {
             messages:
               draftingOutput.questions.length > 0
                 ? draftingOutput.questions
-                : [
-                    appLanguage === 'es'
-                      ? 'Necesito un poco más de información para completar la receta. ¿Podés agregar los pasos de preparación o ingredientes faltantes?'
-                      : 'I need a bit more information to complete the recipe. Can you add the missing preparation steps or ingredients?',
-                  ],
+                : [labels.needMoreInfo],
           };
         }
 
@@ -224,11 +221,7 @@ export class RecipeCreationSupervisor extends Supervisor {
         return {
           status: 'recipe_created',
           recipeId: persistedRecipe.id,
-          messages: [
-            appLanguage === 'es'
-              ? `¡Tu receta "${recipe.title}" fue guardada exitosamente!`
-              : `Your recipe "${recipe.title}" was saved successfully!`,
-          ],
+          messages: [labels.recipeCreated.replace('{title}', recipe.title)],
         };
       },
     );
@@ -263,6 +256,16 @@ export class RecipeCreationSupervisor extends Supervisor {
       merged.instructionSteps = existing.workingDraft.instructionSteps;
     }
 
+    // Append user message + assistant questions to conversation history
+    const prevHistory: ConversationTurn[] = existing?.conversationHistory ?? [];
+    const updatedHistory: ConversationTurn[] = [
+      ...prevHistory,
+      { role: 'user', content: message },
+      ...(draftingOutput.questions.length > 0
+        ? [{ role: 'assistant' as const, content: draftingOutput.questions.join('\n') }]
+        : []),
+    ];
+
     if (existing) {
       await this.sessionRepo.update(existing.id, {
         iterationCount: existing.iterationCount + 1,
@@ -270,10 +273,16 @@ export class RecipeCreationSupervisor extends Supervisor {
         missingFields: draftingOutput.missingFields,
         lastQuestions: draftingOutput.questions,
         lastUserMessage: message,
+        conversationHistory: updatedHistory,
         sourceLanguage: draftingOutput.sourceLanguage,
         confidence: draftingOutput.confidence,
       });
-      return { ...existing, workingDraft: merged, iterationCount: existing.iterationCount + 1 };
+      return {
+        ...existing,
+        workingDraft: merged,
+        iterationCount: existing.iterationCount + 1,
+        conversationHistory: updatedHistory,
+      };
     }
 
     return this.sessionRepo.create({ appLanguage, lastUserMessage: message }).then(async (s) => {
@@ -282,10 +291,11 @@ export class RecipeCreationSupervisor extends Supervisor {
         workingDraft: merged,
         missingFields: draftingOutput.missingFields,
         lastQuestions: draftingOutput.questions,
+        conversationHistory: updatedHistory,
         sourceLanguage: draftingOutput.sourceLanguage,
         confidence: draftingOutput.confidence,
       });
-      return { ...s, workingDraft: merged, iterationCount: 1 };
+      return { ...s, workingDraft: merged, iterationCount: 1, conversationHistory: updatedHistory };
     });
   }
 

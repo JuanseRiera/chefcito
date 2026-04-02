@@ -23,6 +23,7 @@ export class RecipeDraftingAgent extends Agent {
       payload.message,
       payload.currentDraft,
       payload.previousQuestions,
+      payload.conversationHistory,
       payload.iterationCount,
       payload.appLanguage,
       payload.sourceLanguage,

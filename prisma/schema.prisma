@@ -62,8 +62,9 @@ model RecipeCreationSession {
   workingDraft   Json     @default("{}")
   missingFields  Json     @default("[]")
   lastQuestions  Json     @default("[]")
-  lastUserMessage String?
-  confidence     Float    @default(0)
+  lastUserMessage     String?
+  conversationHistory Json     @default("[]")
+  confidence          Float    @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   expiresAt      DateTime
