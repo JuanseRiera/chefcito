@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import type { CreateFromTextResponse } from '@/lib/mas/types/recipeCreation';
-import { useLocale } from '@/lib/i18n/locale-context';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -10,6 +9,11 @@ export interface ChatMessage {
 }
 
 export type CreationStatus = 'idle' | 'loading' | 'asking' | 'success' | 'error';
+
+export interface RecipeCreationErrorLabels {
+  errorUnexpected: string;
+  errorRequestFailed: string;
+}
 
 export interface UseRecipeCreationReturn {
   messages: ChatMessage[];
@@ -20,8 +24,7 @@ export interface UseRecipeCreationReturn {
   reset: () => void;
 }
 
-export function useRecipeCreation(): UseRecipeCreationReturn {
-  const locale = useLocale();
+export function useRecipeCreation(locale: string, errorLabels: RecipeCreationErrorLabels): UseRecipeCreationReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [status, setStatus] = useState<CreationStatus>('idle');
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
@@ -44,8 +47,8 @@ export function useRecipeCreation(): UseRecipeCreationReturn {
         });
 
         if (!response.ok) {
-          const errData = (await response.json().catch(() => ({}))) as { error?: string };
-          throw new Error(errData.error ?? `Request failed with status ${response.status}`);
+          await response.json().catch(() => ({}));
+          throw new Error(errorLabels.errorRequestFailed);
         }
 
         const data = (await response.json()) as CreateFromTextResponse;
@@ -72,7 +75,8 @@ export function useRecipeCreation(): UseRecipeCreationReturn {
           }
         }
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'An unexpected error occurred.';
+        const message = errorLabels.errorUnexpected;
+        void err;
         setStatus('error');
         setError(message);
         setMessages((prev) => [
@@ -81,7 +85,7 @@ export function useRecipeCreation(): UseRecipeCreationReturn {
         ]);
       }
     },
-    [locale, sessionId],
+    [locale, sessionId, errorLabels],
   );
 
   const reset = useCallback(() => {

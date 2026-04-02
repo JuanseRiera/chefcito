@@ -83,6 +83,9 @@
     "send": "Enviar",
     "sending": "Enviando…",
     "viewRecipe": "Ver Receta",
-    "createAnother": "Crear Otra"
+    "createAnother": "Crear Otra",
+    "errorUnexpected": "Ocurrió un error inesperado.",
+    "errorRequestFailed": "La solicitud falló. Por favor intentá de nuevo.",
+    "loadingLabel": "El asistente está escribiendo"
   }
 }

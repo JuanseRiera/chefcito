@@ -34,9 +34,9 @@ The app supports two languages (en, es) using a dictionary-based pattern — **n
 **Every user-visible string must be translated.** When adding or changing UI text:
 
 1. Add the key to both `app/[lang]/dictionaries/en.json` and `app/[lang]/dictionaries/es.json`.
-2. In **server components**, receive `dict` as a prop and use `dict.section.key`.
-3. In **client components**, call `useDictionary()` from `@/lib/i18n/dictionary-context`.
-4. For internal links, always prefix with the locale: `/${lang}/path`. Use the `lang` prop (server) or `useLocale()` (client).
+2. In **server components**, call `getDictionary(lang)` and pass the relevant slice as a typed prop to children.
+3. In **client components**, prefer receiving a typed `labels` prop (e.g. `Dictionary['recipeCreation']`) from a server parent. Only use `useDictionary()` when the component is not mounted under a server component that can pass labels down.
+4. For internal links, always prefix with the locale: `/${lang}/path`. Prefer `lang`/`locale` as a prop when already available from the server. Use `useLocale()` only when no prop is available.
 5. **Recipe metric badges** (servings, prep time, cook time, ingredients) use `getRecipeLabels(recipe.language)` from `lib/i18n/recipeLabels.ts` — these follow the recipe's detected language, NOT the app language.
 
 Key files: `lib/i18n/config.ts`, `lib/i18n/dictionary-context.tsx`, `lib/i18n/locale-context.tsx`, `lib/i18n/recipeLabels.ts`, `app/[lang]/dictionaries.ts`.

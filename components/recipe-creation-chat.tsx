@@ -2,15 +2,20 @@
 
 import { useRef, useEffect, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { useRecipeCreation } from '@/lib/hooks/use-recipe-creation';
-import { useDictionary } from '@/lib/i18n/dictionary-context';
-import { useLocale } from '@/lib/i18n/locale-context';
+import type { Dictionary } from '@/app/[lang]/dictionaries';
 import { Button, LinkButton } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-export function RecipeCreationChat() {
-  const dict = useDictionary();
-  const locale = useLocale();
-  const { messages, status, recipeId, sendMessage, reset } = useRecipeCreation();
+interface RecipeCreationChatProps {
+  labels: Dictionary['recipeCreation'];
+  locale: string;
+}
+
+export function RecipeCreationChat({ labels, locale }: RecipeCreationChatProps) {
+  const { messages, status, recipeId, sendMessage, reset } = useRecipeCreation(locale, {
+    errorUnexpected: labels.errorUnexpected,
+    errorRequestFailed: labels.errorRequestFailed,
+  });
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -43,7 +48,7 @@ export function RecipeCreationChat() {
       <div className="flex-1 overflow-y-auto space-y-4 mb-4 min-h-[200px]">
         {messages.length === 0 && (
           <p className="text-brown-light text-sm text-center py-8">
-            {dict.recipeCreation.placeholder}
+            {labels.placeholder}
           </p>
         )}
         {messages.map((msg, i) => (
@@ -60,7 +65,11 @@ export function RecipeCreationChat() {
           </div>
         ))}
         {status === 'loading' && (
-          <div className="mr-auto bg-white border border-border rounded-2xl rounded-bl-none px-4 py-3">
+          <div
+            className="mr-auto bg-white border border-border rounded-2xl rounded-bl-none px-4 py-3"
+            aria-label={labels.loadingLabel}
+            aria-live="polite"
+          >
             <span className="inline-flex gap-1">
               <span className="w-2 h-2 rounded-full bg-brown-light animate-bounce [animation-delay:0ms]" />
               <span className="w-2 h-2 rounded-full bg-brown-light animate-bounce [animation-delay:150ms]" />
@@ -75,10 +84,10 @@ export function RecipeCreationChat() {
       {status === 'success' && recipeId && (
         <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
           <LinkButton href={`/${locale}/recipes/${recipeId}`} className="flex-1">
-            {dict.recipeCreation.viewRecipe}
+            {labels.viewRecipe}
           </LinkButton>
           <Button variant="outline" onClick={reset} className="flex-1">
-            {dict.recipeCreation.createAnother}
+            {labels.createAnother}
           </Button>
         </div>
       )}
@@ -94,19 +103,19 @@ export function RecipeCreationChat() {
               'placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-ring',
               'focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-50',
             )}
-            placeholder={dict.recipeCreation.inputPlaceholder}
+            placeholder={labels.inputPlaceholder}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isInputDisabled}
-            aria-label={dict.recipeCreation.inputAriaLabel}
+            aria-label={labels.inputAriaLabel}
           />
           <Button
             type="submit"
             disabled={isInputDisabled || !input.trim()}
             className="self-end"
           >
-            {status === 'loading' ? dict.recipeCreation.sending : dict.recipeCreation.send}
+            {status === 'loading' ? labels.sending : labels.send}
           </Button>
         </form>
       )}

@@ -83,6 +83,9 @@
     "send": "Send",
     "sending": "Sending…",
     "viewRecipe": "View Recipe",
-    "createAnother": "Create Another"
+    "createAnother": "Create Another",
+    "errorUnexpected": "An unexpected error occurred.",
+    "errorRequestFailed": "Request failed. Please try again.",
+    "loadingLabel": "Assistant is typing"
   }
 }
