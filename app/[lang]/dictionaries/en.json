@@ -1,7 +1,8 @@
 {
   "nav": {
     "myRecipes": "My Recipes",
-    "extractRecipe": "Extract Recipe"
+    "extractRecipe": "Extract Recipe",
+    "createRecipe": "Create Recipe"
   },
   "footer": {
     "tagline": "Your AI-powered cooking companion"
@@ -11,7 +12,8 @@
     "emptyState": "No recipes yet. Extract your first recipe to get started!",
     "extractCta": "Extract a Recipe",
     "yourRecipes": "Your Recipes",
-    "extractButton": "+ Extract Recipe"
+    "extractButton": "+ Extract Recipe",
+    "createButton": "+ Create Recipe"
   },
   "extract": {
     "title": "Extract a Recipe",
@@ -71,5 +73,26 @@
   "mobileNav": {
     "closeMenu": "Close menu",
     "openMenu": "Open menu"
+  },
+  "recipeCreationSupervisor": {
+    "messageBlocked": "Your message was blocked for security reasons. Please enter a recipe description.",
+    "maxRoundsReached": "Maximum clarification rounds reached. Please start over with a fuller recipe description that includes a title, ingredients, and steps.",
+    "notARecipe": "I couldn't understand your message as a recipe. Please try again with a valid recipe description.",
+    "needMoreInfo": "I need a bit more information to complete the recipe. Can you add the missing preparation steps or ingredients?",
+    "recipeCreated": "Your recipe \"{title}\" was saved successfully!"
+  },
+  "recipeCreation": {
+    "title": "Create a Recipe with AI",
+    "subtitle": "Describe your recipe in plain text and we'll structure it for you.",
+    "placeholder": "Start by describing your recipe. For example: \"Classic spaghetti carbonara: pasta, eggs, guanciale, pecorino, black pepper...\"",
+    "inputPlaceholder": "Describe your recipe or answer the questions above…",
+    "inputAriaLabel": "Recipe message",
+    "send": "Send",
+    "sending": "Sending…",
+    "viewRecipe": "View Recipe",
+    "createAnother": "Create Another",
+    "errorUnexpected": "An unexpected error occurred.",
+    "errorRequestFailed": "Request failed. Please try again.",
+    "loadingLabel": "Assistant is typing"
   }
 }

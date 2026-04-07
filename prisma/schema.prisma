@@ -52,3 +52,20 @@ model InstructionStep {
 
   @@index([recipeId])
 }
+
+model RecipeCreationSession {
+  id             String   @id @default(cuid())
+  status         String   @default("collecting") // collecting | ready_to_save | completed | abandoned
+  appLanguage    String
+  sourceLanguage String?
+  iterationCount Int      @default(0)
+  workingDraft   Json     @default("{}")
+  missingFields  Json     @default("[]")
+  lastQuestions  Json     @default("[]")
+  lastUserMessage     String?
+  conversationHistory Json     @default("[]")
+  confidence          Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  expiresAt      DateTime
+}
