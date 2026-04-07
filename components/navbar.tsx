@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MobileNav } from './mobile-nav';
 import { LanguageToggle } from './language-toggle';
+import { NavLink } from './nav-link';
 import type { Dictionary } from '@/app/[lang]/dictionaries';
 import type { Locale } from '@/lib/i18n/config';
 
@@ -13,8 +14,8 @@ interface NavbarProps {
 export function Navbar({ dict, lang }: NavbarProps) {
   const navLinks = [
     { href: `/${lang}/`, label: dict.nav.myRecipes },
-    { href: `/${lang}/extract`, label: dict.nav.extractRecipe },
     { href: `/${lang}/create`, label: dict.nav.createRecipe },
+    { href: `/${lang}/extract`, label: dict.nav.extractRecipe },
   ];
 
   return (
@@ -33,12 +34,7 @@ export function Navbar({ dict, lang }: NavbarProps) {
         <ul className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <Link
-                href={link.href}
-                className="text-brown-light hover:text-burgundy transition-colors"
-              >
-                {link.label}
-              </Link>
+              <NavLink href={link.href} label={link.label} />
             </li>
           ))}
           <li>
@@ -49,7 +45,7 @@ export function Navbar({ dict, lang }: NavbarProps) {
         {/* Mobile hamburger — visible only on mobile */}
         <div className="md:hidden flex items-center gap-3">
           <LanguageToggle />
-          <MobileNav links={navLinks} />
+          <MobileNav links={navLinks} labels={dict.mobileNav} />
         </div>
       </nav>
     </header>

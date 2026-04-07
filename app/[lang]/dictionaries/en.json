@@ -24,6 +24,7 @@
   "extractForm": {
     "placeholder": "https://example.com/recipe",
     "ariaLabel": "Recipe URL",
+    "hint": "Works best with public recipe pages that include ingredients and instructions.",
     "emptyUrl": "Please enter a URL.",
     "invalidUrl": "Please enter a valid URL (e.g., https://example.com/recipe).",
     "extracting": "Extracting...",
@@ -84,13 +85,31 @@
   "recipeCreation": {
     "title": "Create a Recipe with AI",
     "subtitle": "Describe your recipe in plain text and we'll structure it for you.",
-    "placeholder": "Start by describing your recipe. For example: \"Classic spaghetti carbonara: pasta, eggs, guanciale, pecorino, black pepper...\"",
+    "placeholder": "Start with the full recipe, not just the idea. Chefcito can usually save it in one try when you include a title, ingredients, and preparation steps.",
+    "examplesTitle": "Complete examples",
+    "useExample": "Use example",
+    "examples": [
+      {
+        "title": "Chicken Tacos",
+        "summary": "Good one-turn example with title, ingredients, and steps.",
+        "preview": "Chicken tacos\nIngredients: 500 g chicken thighs, 8 tortillas, 1 avocado, 1 tomato, 1/4 onion, juice of 1 lime, 1 tsp paprika, 1 tsp cumin, salt, olive oil.\nSteps: Season and cook the chicken, shred it, mix the salsa, warm the tortillas, and assemble.",
+        "prompt": "Chicken tacos\nIngredients:\n- 500 g chicken thighs\n- 8 corn tortillas\n- 1 avocado\n- 1 tomato\n- 1/4 white onion\n- juice of 1 lime\n- 1 tsp paprika\n- 1 tsp cumin\n- salt\n- 1 tbsp olive oil\n\nSteps:\n1. Season the chicken with paprika, cumin, and salt.\n2. Cook the chicken in olive oil over medium heat until fully cooked and lightly browned.\n3. Shred the chicken into bite-size pieces.\n4. Mix the avocado, tomato, onion, lime juice, and a pinch of salt to make a quick salsa.\n5. Warm the tortillas in a dry pan.\n6. Fill the tortillas with chicken and top with the avocado salsa."
+      },
+      {
+        "title": "Banana Bread",
+        "summary": "A complete baking example with exact ingredients and sequential steps.",
+        "preview": "Banana bread\nIngredients: 3 ripe bananas, 2 eggs, 100 g melted butter, 150 g sugar, 200 g flour, 1 tsp baking soda, 1 pinch salt.\nSteps: Mash bananas, mix wet ingredients, fold in dry ingredients, pour into pan, and bake.",
+        "prompt": "Banana bread\nIngredients:\n- 3 ripe bananas\n- 2 eggs\n- 100 g melted butter\n- 150 g sugar\n- 200 g all-purpose flour\n- 1 tsp baking soda\n- 1 pinch salt\n\nSteps:\n1. Preheat the oven to 180°C and grease a loaf pan.\n2. Mash the bananas in a large bowl.\n3. Whisk in the eggs, melted butter, and sugar until combined.\n4. Add the flour, baking soda, and salt, then mix just until no dry streaks remain.\n5. Pour the batter into the prepared pan.\n6. Bake for 50 to 60 minutes, until a toothpick comes out clean.\n7. Let it cool for 10 minutes before unmolding."
+      }
+    ],
     "inputPlaceholder": "Describe your recipe or answer the questions above…",
     "inputAriaLabel": "Recipe message",
+    "composerHint": "Press Enter to send. Use Shift+Enter for a new line.",
     "send": "Send",
     "sending": "Sending…",
     "viewRecipe": "View Recipe",
     "createAnother": "Create Another",
+    "errorTitle": "Something went wrong",
     "errorUnexpected": "An unexpected error occurred.",
     "errorRequestFailed": "Request failed. Please try again.",
     "loadingLabel": "Assistant is typing"

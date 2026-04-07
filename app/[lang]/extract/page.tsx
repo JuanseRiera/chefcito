@@ -1,65 +1,26 @@
-'use client';
+import { notFound } from 'next/navigation';
+import { ExtractPageClient } from '@/components/extract-page-client';
+import { getDictionary } from '@/app/[lang]/dictionaries';
+import { hasLocale } from '@/lib/i18n/config';
+import type { Locale } from '@/lib/i18n/config';
 
-import { useRecipeExtraction } from '@/lib/hooks/use-recipe-extraction';
-import { ExtractForm } from '@/components/extract-form';
-import { ExtractionProgress } from '@/components/extraction-progress';
-import { ExtractionResult } from '@/components/extraction-result';
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { useDictionary } from '@/lib/i18n/dictionary-context';
+export default async function ExtractPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  if (!hasLocale(lang)) notFound();
 
-export default function ExtractPage() {
-  const dict = useDictionary();
-  const {
-    status,
-    completedStages,
-    currentStage,
-    result,
-    error,
-    extract,
-    reset,
-  } = useRecipeExtraction();
+  const dict = await getDictionary(lang as Locale);
 
   return (
-    <div className="max-w-xl mx-auto">
-      <h1 className="font-serif text-3xl text-charcoal mb-2">
-        {dict.extract.title}
-      </h1>
-      <p className="text-brown-light mb-8">{dict.extract.subtitle}</p>
-
-      {status !== 'success' && (
-        <ExtractForm onSubmit={extract} isLoading={status === 'extracting'} />
-      )}
-
-      {status === 'error' && error && (
-        <Alert variant="destructive" className="mt-6">
-          <AlertTitle>{dict.extract.failed}</AlertTitle>
-          <AlertDescription>{error.message}</AlertDescription>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-3"
-            onClick={reset}
-          >
-            {dict.extract.tryAgain}
-          </Button>
-        </Alert>
-      )}
-
-      {status === 'extracting' && (
-        <ExtractionProgress
-          completedStages={completedStages}
-          currentStage={currentStage}
-        />
-      )}
-
-      {status === 'success' && result && (
-        <ExtractionResult recipe={result} onExtractAnother={reset} />
-      )}
-    </div>
+    <ExtractPageClient
+      extractLabels={dict.extract}
+      extractFormLabels={dict.extractForm}
+      extractionProgressLabels={dict.extractionProgress}
+      extractionResultLabels={dict.extractionResult}
+      lang={lang}
+    />
   );
 }
