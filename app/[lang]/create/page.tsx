@@ -24,7 +24,7 @@ export default async function CreateRecipePage({
           {dict.recipeCreation.subtitle}
         </p>
       </div>
-      <div>
+      <div className='min-h-0 flex-1'>
         <RecipeCreationChat labels={dict.recipeCreation} locale={lang} />
       </div>
     </div>

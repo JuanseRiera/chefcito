@@ -63,8 +63,8 @@ export function RecipeCreationChat({
   const isInputDisabled = status === 'loading' || status === 'success';
 
   return (
-    <div className="flex flex-col rounded-[1.75rem] border border-border bg-card shadow-sm">
-      <div ref={threadRef} className="space-y-4 px-4 py-4 sm:px-5 overflow-y-auto">
+    <div className="flex flex-col rounded-[1.75rem] border border-border bg-card shadow-sm h-full">
+      <div ref={threadRef} className="space-y-4 px-4 py-4 sm:px-5 overflow-y-auto flex-1">
         {messages.length === 0 && (
           <div className="space-y-3 rounded-2xl border border-dashed border-border bg-parchment/70 p-4 sm:p-5">
             <p className="text-sm leading-6 text-brown-light">
