@@ -1,7 +1,7 @@
 'use client';
 
 import type { PipelineStage } from '@/lib/types/sse';
-import { useDictionary } from '@/lib/i18n/dictionary-context';
+import type { Dictionary } from '@/app/[lang]/dictionaries';
 
 interface CompletedStage {
   stage: PipelineStage;
@@ -9,27 +9,27 @@ interface CompletedStage {
 }
 
 interface ExtractionProgressProps {
+  labels: Dictionary['extractionProgress'];
   completedStages: CompletedStage[];
   currentStage: { stage: PipelineStage; message: string } | null;
 }
 
 export function ExtractionProgress({
+  labels,
   completedStages,
   currentStage,
 }: ExtractionProgressProps) {
-  const dict = useDictionary();
-
   const stageLabels: Record<PipelineStage, string> = {
-    fetching: dict.extractionProgress.fetching,
-    extracting: dict.extractionProgress.extracting,
-    curating: dict.extractionProgress.curating,
-    retrying: dict.extractionProgress.retrying,
-    persisting: dict.extractionProgress.persisting,
-    uploading_image: dict.extractionProgress.uploading_image,
+    fetching: labels.fetching,
+    extracting: labels.extracting,
+    curating: labels.curating,
+    retrying: labels.retrying,
+    persisting: labels.persisting,
+    uploading_image: labels.uploading_image,
   };
 
   return (
-    <div className="mt-8 space-y-3">
+    <div className="space-y-3">
       {/* Completed stages */}
       {completedStages.map((stage, i) => (
         <div key={i} className="flex items-center gap-3">

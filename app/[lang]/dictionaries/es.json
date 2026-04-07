@@ -24,6 +24,7 @@
   "extractForm": {
     "placeholder": "https://ejemplo.com/receta",
     "ariaLabel": "URL de la receta",
+    "hint": "Funciona mejor con páginas públicas de recetas que incluyen ingredientes e instrucciones.",
     "emptyUrl": "Por favor ingresa una URL.",
     "invalidUrl": "Por favor ingresa una URL válida (ej., https://ejemplo.com/receta).",
     "extracting": "Extrayendo...",
@@ -84,13 +85,31 @@
   "recipeCreation": {
     "title": "Crear una Receta con IA",
     "subtitle": "Describí tu receta en texto libre y la estructuramos por vos.",
-    "placeholder": "Empezá describiendo tu receta. Por ejemplo: \"Spaghetti carbonara clásico: pasta, huevos, guanciale, pecorino, pimienta negra...\"",
+    "placeholder": "Empezá con la receta completa, no solo con la idea. Chefcito normalmente la puede guardar en un solo intento si incluís título, ingredientes y pasos.",
+    "examplesTitle": "Ejemplos completos",
+    "useExample": "Usar ejemplo",
+    "examples": [
+      {
+        "title": "Tacos de pollo",
+        "summary": "Buen ejemplo de un solo turno con título, ingredientes y pasos.",
+        "preview": "Tacos de pollo\nIngredientes: 500 g de muslos de pollo, 8 tortillas, 1 palta, 1 tomate, 1/4 cebolla, jugo de 1 lima, 1 cdta pimentón, 1 cdta comino, sal, aceite de oliva.\nPasos: Condimentar y cocinar el pollo, desmenuzarlo, mezclar la salsa, calentar las tortillas y armar.",
+        "prompt": "Tacos de pollo\nIngredientes:\n- 500 g de muslos de pollo\n- 8 tortillas de maíz\n- 1 palta\n- 1 tomate\n- 1/4 cebolla blanca\n- jugo de 1 lima\n- 1 cdta de pimentón\n- 1 cdta de comino\n- sal\n- 1 cda de aceite de oliva\n\nPasos:\n1. Condimentá el pollo con pimentón, comino y sal.\n2. Cociná el pollo con el aceite de oliva a fuego medio hasta que esté bien cocido y dorado.\n3. Desmenuzá el pollo en trozos chicos.\n4. Mezclá la palta, el tomate, la cebolla, el jugo de lima y una pizca de sal para hacer una salsa rápida.\n5. Calentá las tortillas en una sartén seca.\n6. Rellená las tortillas con el pollo y terminá con la salsa de palta."
+      },
+      {
+        "title": "Budín de banana",
+        "summary": "Ejemplo de pastelería completo con ingredientes exactos y pasos en orden.",
+        "preview": "Budín de banana\nIngredientes: 3 bananas maduras, 2 huevos, 100 g de manteca derretida, 150 g de azúcar, 200 g de harina, 1 cdta de bicarbonato, 1 pizca de sal.\nPasos: Pisar bananas, mezclar húmedos, integrar secos, llevar al molde y hornear.",
+        "prompt": "Budín de banana\nIngredientes:\n- 3 bananas maduras\n- 2 huevos\n- 100 g de manteca derretida\n- 150 g de azúcar\n- 200 g de harina común\n- 1 cdta de bicarbonato de sodio\n- 1 pizca de sal\n\nPasos:\n1. Precalentá el horno a 180°C y enmantecá un molde de budín.\n2. Pisá las bananas en un bowl grande.\n3. Agregá los huevos, la manteca derretida y el azúcar, y mezclá hasta integrar.\n4. Sumá la harina, el bicarbonato y la sal, y mezclá solo hasta que no queden partes secas.\n5. Volcá la mezcla en el molde preparado.\n6. Horneá entre 50 y 60 minutos, hasta que al pincharlo salga limpio.\n7. Dejalo enfriar 10 minutos antes de desmoldar."
+      }
+    ],
     "inputPlaceholder": "Describí tu receta o respondé las preguntas de arriba…",
     "inputAriaLabel": "Mensaje de receta",
+    "composerHint": "Apretá Enter para enviar. Usá Shift+Enter para una nueva línea.",
     "send": "Enviar",
     "sending": "Enviando…",
     "viewRecipe": "Ver Receta",
     "createAnother": "Crear Otra",
+    "errorTitle": "Algo salió mal",
     "errorUnexpected": "Ocurrió un error inesperado.",
     "errorRequestFailed": "La solicitud falló. Por favor intentá de nuevo.",
     "loadingLabel": "El asistente está escribiendo"

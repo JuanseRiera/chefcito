@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { useDictionary } from '@/lib/i18n/dictionary-context';
+import type { Dictionary } from '@/app/[lang]/dictionaries';
+import { NavLink } from './nav-link';
 
 interface MobileNavProps {
   links: { href: string; label: string }[];
+  labels: Dictionary['mobileNav'];
 }
 
-export function MobileNav({ links }: MobileNavProps) {
+export function MobileNav({ links, labels }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const dict = useDictionary();
 
   return (
     <>
@@ -18,7 +18,7 @@ export function MobileNav({ links }: MobileNavProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 text-brown hover:text-burgundy"
-        aria-label={isOpen ? dict.mobileNav.closeMenu : dict.mobileNav.openMenu}
+        aria-label={isOpen ? labels.closeMenu : labels.openMenu}
         aria-expanded={isOpen}
       >
         {isOpen ? (
@@ -63,13 +63,12 @@ export function MobileNav({ links }: MobileNavProps) {
           <ul className="flex flex-col py-2">
             {links.map((link) => (
               <li key={link.href}>
-                <Link
+                <NavLink
                   href={link.href}
+                  label={link.label}
+                  mobile
                   onClick={() => setIsOpen(false)}
-                  className="block px-4 py-3 text-brown-light hover:text-burgundy hover:bg-parchment-dark transition-colors"
-                >
-                  {link.label}
-                </Link>
+                />
               </li>
             ))}
           </ul>

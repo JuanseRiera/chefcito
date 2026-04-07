@@ -31,7 +31,11 @@ You MUST read and follow [docs/DEVELOPER_WORKFLOW.md](./docs/DEVELOPER_WORKFLOW.
 
 The app supports two languages (en, es) using a dictionary-based pattern — **no external i18n libraries**.
 
-**Every user-visible string must be translated.** When adding or changing UI text:
+**Every user-visible string must be translated.**
+
+Exception: The application's brand name "Chefcito" may be used as a literal and does not require translation keys.
+
+When adding or changing UI text:
 
 1. Add the key to both `app/[lang]/dictionaries/en.json` and `app/[lang]/dictionaries/es.json`.
 2. In **server components**, call `getDictionary(lang)` and pass the relevant slice as a typed prop to children.
