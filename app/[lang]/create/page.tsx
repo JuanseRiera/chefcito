@@ -15,7 +15,7 @@ export default async function CreateRecipePage({
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <div className="max-w-xl mx-auto flex flex-col" style={{ height: 'calc(100vh - 180px)' }}>
+    <div className="max-w-xl mx-auto flex flex-col h-[calc(100dvh-var(--navbar-height)-var(--footer-height)-var(--page-vertical-padding)*2)]">
       <h1 className="font-serif text-3xl text-charcoal mb-1">
         {dict.recipeCreation.title}
       </h1>

@@ -1,6 +1,12 @@
 'use client';
 
-import { useRef, useEffect, useState, type FormEvent, type KeyboardEvent } from 'react';
+import {
+  useRef,
+  useEffect,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+} from 'react';
 import { useRecipeCreation } from '@/lib/hooks/use-recipe-creation';
 import type { Dictionary } from '@/app/[lang]/dictionaries';
 import { Button, LinkButton } from '@/components/ui/button';
@@ -11,11 +17,17 @@ interface RecipeCreationChatProps {
   locale: string;
 }
 
-export function RecipeCreationChat({ labels, locale }: RecipeCreationChatProps) {
-  const { messages, status, recipeId, sendMessage, reset } = useRecipeCreation(locale, {
-    errorUnexpected: labels.errorUnexpected,
-    errorRequestFailed: labels.errorRequestFailed,
-  });
+export function RecipeCreationChat({
+  labels,
+  locale,
+}: RecipeCreationChatProps) {
+  const { messages, status, recipeId, sendMessage, reset } = useRecipeCreation(
+    locale,
+    {
+      errorUnexpected: labels.errorUnexpected,
+      errorRequestFailed: labels.errorRequestFailed,
+    },
+  );
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -45,7 +57,7 @@ export function RecipeCreationChat({ labels, locale }: RecipeCreationChatProps) 
   return (
     <div className="flex flex-col h-full">
       {/* Message thread */}
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4 min-h-[200px]">
+      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
         {messages.length === 0 && (
           <p className="text-brown-light text-sm text-center py-8">
             {labels.placeholder}
@@ -83,7 +95,10 @@ export function RecipeCreationChat({ labels, locale }: RecipeCreationChatProps) 
       {/* Success state */}
       {status === 'success' && recipeId && (
         <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
-          <LinkButton href={`/${locale}/recipes/${recipeId}`} className="flex-1">
+          <LinkButton
+            href={`/${locale}/recipes/${recipeId}`}
+            className="flex-1"
+          >
             {labels.viewRecipe}
           </LinkButton>
           <Button variant="outline" onClick={reset} className="flex-1">
@@ -94,7 +109,10 @@ export function RecipeCreationChat({ labels, locale }: RecipeCreationChatProps) 
 
       {/* Input form */}
       {status !== 'success' && (
-        <form onSubmit={handleSubmit} className="flex gap-2 pt-2 border-t border-border">
+        <form
+          onSubmit={handleSubmit}
+          className="flex gap-2 pt-2 border-t border-border"
+        >
           <textarea
             ref={textareaRef}
             rows={3}
