@@ -46,7 +46,7 @@ export const draftingAgentOutputSchema = z.object({
   confidence: z.number().min(0).max(1),
   sourceLanguage: z.string(),
   safetyFlags: z.array(z.string()),
-  reason: z.string().optional(),
+  reason: z.string().nullish(),
 });
 
 export type DraftingAgentOutput = z.infer<typeof draftingAgentOutputSchema>;

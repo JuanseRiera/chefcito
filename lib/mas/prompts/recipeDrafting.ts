@@ -104,7 +104,7 @@ interface DraftingAgentOutput {
   confidence: number;       // 0.0 to 1.0
   sourceLanguage: string;   // ISO 639-1 code (e.g. "en", "es")
   safetyFlags: string[];    // empty array if safe
-  reason?: string;          // explanation when action is "reject" — write in the user's language (source language)
+  reason?: string;          // only when action is "reject" — OMIT entirely (do not set null) otherwise; write in the user's language (source language)
 }
 \`\`\`
 
@@ -143,8 +143,7 @@ Output:
   "questions": [],
   "confidence": 0.9,
   "sourceLanguage": "en",
-  "safetyFlags": [],
-  "reason": null
+  "safetyFlags": []
 }
 \`\`\`
 
