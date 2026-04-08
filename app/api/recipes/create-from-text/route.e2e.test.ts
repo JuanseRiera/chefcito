@@ -95,6 +95,24 @@ describe('POST /api/recipes/create-from-text', () => {
       expect(body.sessionId).toBe('sess-abc');
     });
 
+    it('returns 200 asking_followup when user sends only a recipe title (minimal input)', async () => {
+      // Regression: "empanadas" with appLanguage "en" used to crash with LLM_PARSING_FAILED
+      // because the LLM returned reason: null, which Zod rejected as invalid.
+      const supervisorResult: CreateFromTextResponse = {
+        status: 'asking_followup',
+        sessionId: 'sess-minimal',
+        messages: ['What are the ingredients and steps for your empanadas?'],
+      };
+      mockProcessTurn.mockResolvedValue(supervisorResult);
+
+      const response = await POST(makeRequest({ message: 'empanadas', appLanguage: 'en' }));
+
+      expect(response.status).toBe(200);
+      const body = await response.json() as CreateFromTextResponse;
+      expect(body.status).toBe('asking_followup');
+      expect(body.messages).toHaveLength(1);
+    });
+
     it('returns 200 with rejected status', async () => {
       const supervisorResult: CreateFromTextResponse = {
         status: 'rejected',
@@ -128,6 +146,20 @@ describe('POST /api/recipes/create-from-text', () => {
       const response = await POST(
         makeRequest({ message: 'some recipe', appLanguage: 'en' }),
       );
+
+      expect(response.status).toBe(422);
+    });
+
+    it('returns 422 (not 500) when LLM returns null for reason field on minimal input', async () => {
+      // Regression: before the fix, reason: null caused an unhandled ZodError that surfaced as 500.
+      const { LLMParsingError } = await import('@/lib/mas/types/exceptions');
+      mockProcessTurn.mockRejectedValue(
+        new LLMParsingError(
+          'RecipeDraftingAgent: LLM output failed schema validation: Invalid input: expected string, received null',
+        ),
+      );
+
+      const response = await POST(makeRequest({ message: 'empanadas', appLanguage: 'en' }));
 
       expect(response.status).toBe(422);
     });
