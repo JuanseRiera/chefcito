@@ -65,7 +65,7 @@ export default async function LangLayout({
         <DictionaryProvider dictionary={dict}>
           <LocaleProvider locale={lang as Locale}>
             <Navbar dict={dict} lang={lang as Locale} />
-            <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-8">
+            <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-(--page-vertical-padding)">
               {children}
             </main>
             <Footer dict={dict} />

@@ -19,8 +19,8 @@ export function Navbar({ dict, lang }: NavbarProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-parchment border-b border-parchment-dark">
-      <nav className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-parchment border-b border-parchment-dark h-(--navbar-height)">
+      <nav className="max-w-5xl mx-auto px-4 flex items-center justify-between h-full">
         {/* Logo */}
         <Link
           href={`/${lang}/`}

@@ -15,7 +15,7 @@ export default async function CreateRecipePage({
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-4">
+    <div className="mx-auto flex max-w-3xl flex-col gap-4 h-[calc(100dvh-var(--navbar-height)-var(--footer-height)-var(--page-vertical-padding)*2)]">
       <div>
         <h1 className="font-serif text-3xl text-charcoal mb-2">
           {dict.recipeCreation.title}
@@ -24,7 +24,7 @@ export default async function CreateRecipePage({
           {dict.recipeCreation.subtitle}
         </p>
       </div>
-      <div>
+      <div className='min-h-0 flex-1'>
         <RecipeCreationChat labels={dict.recipeCreation} locale={lang} />
       </div>
     </div>

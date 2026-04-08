@@ -6,10 +6,9 @@ interface FooterProps {
 
 export function Footer({ dict }: FooterProps) {
   return (
-    <footer className="border-t border-parchment-dark py-6 mt-auto">
+    <footer className="border-t border-parchment-dark py-6 mt-auto h-(--footer-height)">
       <div className="max-w-5xl mx-auto px-4 text-center text-brown-light text-sm">
-        <span className="font-serif">Chefcito</span> —{' '}
-        {dict.footer.tagline}
+        <span className="font-serif">Chefcito</span> — {dict.footer.tagline}
       </div>
     </footer>
   );
